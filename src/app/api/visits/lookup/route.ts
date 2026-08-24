@@ -9,7 +9,11 @@ export async function GET(req: NextRequest) {
 
   const visit = await db.visit.findUnique({
     where: { qrCode: qr },
-    include: { visitor: true, department: true },
+    include: {
+      visitor: true,
+      department: true,
+      stops: { include: { department: true }, orderBy: { checkedInAt: "asc" } },
+    },
   });
 
   if (!visit) {

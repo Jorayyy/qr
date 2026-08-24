@@ -161,3 +161,28 @@ export async function cancelVisitAction(visitId: string) {
     return { success: false, message: "Failed to cancel visit." };
   }
 }
+
+export async function addVisitStopAction(visitId: string, departmentId: string, building?: string, notes?: string) {
+  try {
+    await db.visitStop.create({
+      data: { visitId, departmentId, building, notes },
+    });
+    revalidatePath("/scanner");
+    return { success: true, message: "Stop logged." };
+  } catch {
+    return { success: false, message: "Failed to log stop." };
+  }
+}
+
+export async function checkOutStopAction(stopId: string) {
+  try {
+    await db.visitStop.update({
+      where: { id: stopId },
+      data: { checkedOutAt: new Date() },
+    });
+    revalidatePath("/scanner");
+    return { success: true, message: "Stop checked out." };
+  } catch {
+    return { success: false, message: "Failed to check out stop." };
+  }
+}

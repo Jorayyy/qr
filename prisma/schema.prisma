@@ -70,7 +70,8 @@ model Department {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  visits Visit[]
+  visits     Visit[]
+  visitStops VisitStop[]
 
   @@map("departments")
 }
@@ -114,12 +115,29 @@ model Visit {
 
   visitor    Visitor    @relation(fields: [visitorId], references: [id], onDelete: Cascade)
   department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  stops      VisitStop[]
 
   @@index([visitorId])
   @@index([departmentId])
   @@index([status])
   @@index([qrCode])
   @@map("visits")
+}
+
+model VisitStop {
+  id             String   @id @default(uuid())
+  visitId        String
+  departmentId   String
+  building       String?
+  checkedInAt    DateTime @default(now())
+  checkedOutAt   DateTime?
+  notes          String?
+
+  visit      Visit      @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  @@index([visitId])
+  @@map("visit_stops")
 }
 
 model QRTemplate {

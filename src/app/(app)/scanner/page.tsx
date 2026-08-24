@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useTransition, useEffect, useRef, useCallback } from "react";
-import { Card, CardHeader, Input, Button, Badge } from "@/components/ui";
-import { checkInAction, checkOutAction } from "@/lib/actions/visitors";
-import { QrCode, Search, CheckCircle, XCircle, LogIn, LogOut, Camera, X, Keyboard } from "lucide-react";
+import { Card, CardHeader, Input, Button, Badge, Select } from "@/components/ui";
+import { checkInAction, checkOutAction, addVisitStopAction, checkOutStopAction } from "@/lib/actions/visitors";
+import { QrCode, Search, CheckCircle, XCircle, LogIn, LogOut, Camera, X, Keyboard, MapPin, Plus } from "lucide-react";
 
 function formatDate(d: Date | string | null) {
   if (!d) return "—";
@@ -31,6 +31,9 @@ export default function ScannerPage() {
   const [isPending, startTransition] = useTransition();
   const [cameraActive, setCameraActive] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [departments, setDepartments] = useState<Array<{ id: string; name: string; building: string | null }>>([]);
+  const [stopDept, setStopDept] = useState("");
+  const [stopBuilding, setStopBuilding] = useState("");
   const scannerRef = useRef<any>(null);
   const html5QrCodeRef = useRef<any>(null);
 
@@ -59,6 +62,7 @@ export default function ScannerPage() {
       const data = await res.json();
       setResult(data);
       stopCamera();
+      fetch("/api/departments").then((r) => r.json()).then(setDepartments);
     } catch {
       setError("Failed to look up QR code.");
     }
@@ -148,6 +152,34 @@ export default function ScannerPage() {
         setResult({ ...result, status: "CHECKED_OUT", actualDeparture: new Date().toISOString() });
       } else {
         setFeedback(res.message);
+      }
+    });
+  }
+
+  async function handleAddStop() {
+    if (!result || !stopDept) return;
+    setFeedback("");
+    startTransition(async () => {
+      const res = await addVisitStopAction(result.id, stopDept, stopBuilding || undefined);
+      if (res.success) {
+        const updated = await fetch(`/api/visits/lookup?qr=${encodeURIComponent(result.qrCode)}`).then((r) => r.json());
+        setResult(updated);
+        setStopDept("");
+        setStopBuilding("");
+        setFeedback("Stop logged!");
+      } else {
+        setFeedback(res.message);
+      }
+    });
+  }
+
+  async function handleCheckoutStop(stopId: string) {
+    startTransition(async () => {
+      const res = await checkOutStopAction(stopId);
+      if (res.success) {
+        const updated = await fetch(`/api/visits/lookup?qr=${encodeURIComponent(result.qrCode)}`).then((r) => r.json());
+        setResult(updated);
+        setFeedback("Stop checked out.");
       }
     });
   }
@@ -296,10 +328,50 @@ export default function ScannerPage() {
             )}
 
             {result.status === "CHECKED_IN" && (
-              <Button variant="danger" onClick={handleCheckOut} disabled={isPending} className="w-full">
-                <LogOut className="h-4 w-4" />
-                {isPending ? "Processing..." : "Check Out"}
-              </Button>
+              <>
+                <div className="rounded-lg border border-[var(--border)] p-4 space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Visit Stops</p>
+                  {result.stops && result.stops.length > 0 ? (
+                    <div className="space-y-2">
+                      {result.stops.map((stop: any) => (
+                        <div key={stop.id} className="flex items-center justify-between rounded bg-slate-50 px-3 py-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                            <span className="font-medium">{stop.department?.name || "Unknown"}</span>
+                            {stop.building && <span className="text-xs text-[var(--muted)]">({stop.building})</span>}
+                            <span className="text-xs text-[var(--muted)]">{formatDate(stop.checkedInAt)}</span>
+                          </div>
+                          {!stop.checkedOutAt ? (
+                            <button onClick={() => handleCheckoutStop(stop.id)} className="text-xs text-red-600 hover:underline">
+                              Check Out
+                            </button>
+                          ) : (
+                            <span className="text-xs text-emerald-600">Left {formatDate(stop.checkedOutAt)}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-[var(--muted)]">No stops logged yet.</p>
+                  )}
+                  <div className="flex gap-2">
+                    <Select value={stopDept} onChange={(e) => setStopDept(e.target.value)}>
+                      <option value="">Select department</option>
+                      {departments.map((d) => (
+                        <option key={d.id} value={d.id}>{d.name}</option>
+                      ))}
+                    </Select>
+                    <Input value={stopBuilding} onChange={(e) => setStopBuilding(e.target.value)} placeholder="Building (optional)" className="flex-1" />
+                    <Button onClick={handleAddStop} disabled={!stopDept || isPending}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <Button variant="danger" onClick={handleCheckOut} disabled={isPending} className="w-full">
+                  <LogOut className="h-4 w-4" />
+                  {isPending ? "Processing..." : "Check Out"}
+                </Button>
+              </>
             )}
 
             {(result.status === "CHECKED_OUT" || result.status === "CANCELLED") && (
