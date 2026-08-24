@@ -97,6 +97,11 @@ export default function RegisterVisitorPage() {
     registerVisitorAction,
     { success: false, message: "" }
   );
+  const [departments, setDepartments] = useState<Array<{ id: string; name: string; building: string | null }>>([]);
+
+  useEffect(() => {
+    fetch("/api/departments").then((r) => r.json()).then(setDepartments);
+  }, []);
 
   if (state.success && state.data) {
     return (
@@ -199,7 +204,14 @@ export default function RegisterVisitorPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="label">Department *</label>
-              <Input name="departmentId" required placeholder="Department ID" />
+              <Select name="departmentId" required>
+                <option value="">Select department</option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}{d.building ? ` (${d.building})` : ""}
+                  </option>
+                ))}
+              </Select>
             </div>
             <div>
               <label className="label">Purpose *</label>
