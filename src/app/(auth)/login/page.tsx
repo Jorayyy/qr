@@ -27,6 +27,16 @@ export default async function LoginPage() {
         <h2 className="mb-4 text-sm font-bold tracking-tight">Sign in to your account</h2>
         <LoginForm />
       </div>
+
+      <a
+        href="/kiosk"
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground)] shadow-sm transition hover:bg-gray-50"
+      >
+        <svg className="h-5 w-5 text-[var(--brand)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" />
+        </svg>
+        Kiosk Mode
+      </a>
     </div>
   );
 }
