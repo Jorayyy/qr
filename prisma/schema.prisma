@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  STAFF
+  SECURITY
+  RECEPTIONIST
+}
+
+enum IdType {
+  SSS
+  TIN
+  PASSPORT
+  STUDENT_ID
+  OTHER
+}
+
+enum VisitPurpose {
+  ATTENDANCE
+  DELIVERY
+  INTERVIEW
+  MEETING
+  SCHOOL_VISIT
+  OTHER
+}
+
+enum VisitStatus {
+  PENDING
+  CHECKED_IN
+  CHECKED_OUT
+  CANCELLED
+}
+
+enum QRTemplateType {
+  SINGLE_USE
+  RECURRING
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole @default(STAFF)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Department {
+  id            String   @id @default(uuid())
+  name          String   @unique
+  building      String?
+  contactPerson String?
+  contactEmail  String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  visits Visit[]
+
+  @@map("departments")
+}
+
+model Visitor {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  company   String?
+  idType    IdType
+  idNumber  String?
+  photoUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  visits Visit[]
+
+  @@index([email])
+  @@index([phone])
+  @@map("visitors")
+}
+
+model Visit {
+  id                 String      @id @default(uuid())
+  visitorId          String
+  departmentId       String
+  purpose            VisitPurpose
+  status             VisitStatus @default(PENDING)
+  expectedArrival    DateTime?
+  actualArrival      DateTime?
+  actualDeparture    DateTime?
+  hostName           String?
+  hostDepartment     String?
+  vehiclePlateNumber String?
+  qrCode             String      @unique
+  notes              String?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  visitor    Visitor    @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  @@index([visitorId])
+  @@index([departmentId])
+  @@index([status])
+  @@index([qrCode])
+  @@map("visits")
+}
+
+model QRTemplate {
+  id        String         @id @default(uuid())
+  name      String
+  type      QRTemplateType @default(SINGLE_USE)
+  isActive  Boolean        @default(true)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@map("qr_templates")
+}
