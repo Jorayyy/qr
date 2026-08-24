@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { Card, CardHeader, Badge, Button, EmptyState, PageHeader } from "@/components/ui";
-import { ArrowLeft, Mail, Phone, Building2, CreditCard } from "lucide-react";
+import { ArrowLeft, Mail, Phone, Building2, CreditCard, MapPin } from "lucide-react";
 
 function formatDate(d: Date | null) {
   if (!d) return "—";
@@ -33,7 +33,10 @@ export default async function VisitorDetailPage({
     include: {
       visits: {
         orderBy: { createdAt: "desc" },
-        include: { department: true },
+        include: {
+          department: true,
+          stops: { include: { department: true }, orderBy: { checkedInAt: "asc" } },
+        },
       },
     },
   });
@@ -81,33 +84,43 @@ export default async function VisitorDetailPage({
           {visitor.visits.length === 0 ? (
             <EmptyState title="No visits yet" hint="This visitor has no recorded visits." />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--border)] text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
-                    <th className="px-5 py-3">Date</th>
-                    <th className="px-5 py-3">Department</th>
-                    <th className="px-5 py-3">Purpose</th>
-                    <th className="px-5 py-3">Status</th>
-                    <th className="px-5 py-3">Check In</th>
-                    <th className="px-5 py-3">Check Out</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border)]">
-                  {visitor.visits.map((v) => (
-                    <tr key={v.id} className="hover:bg-slate-50">
-                      <td className="px-5 py-3">{formatDate(v.createdAt)}</td>
-                      <td className="px-5 py-3 text-[var(--muted)]">{v.department.name}</td>
-                      <td className="px-5 py-3 text-[var(--muted)]">{v.purpose.replace("_", " ")}</td>
-                      <td className="px-5 py-3">
-                        <Badge tone={STATUS_BADGE[v.status]?.tone}>{v.status.replace("_", " ")}</Badge>
-                      </td>
-                      <td className="px-5 py-3 text-[var(--muted)]">{formatDate(v.actualArrival)}</td>
-                      <td className="px-5 py-3 text-[var(--muted)]">{formatDate(v.actualDeparture)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="divide-y divide-[var(--border)]">
+              {visitor.visits.map((v) => (
+                <div key={v.id} className="p-5">
+                  <div className="flex flex-wrap items-center gap-4 text-sm">
+                    <span className="font-medium">{formatDate(v.createdAt)}</span>
+                    <span className="text-[var(--muted)]">{v.department.name}</span>
+                    <span className="text-[var(--muted)]">{v.purpose.replace("_", " ")}</span>
+                    <Badge tone={STATUS_BADGE[v.status]?.tone}>{v.status.replace("_", " ")}</Badge>
+                    <span className="text-[var(--muted)]">In: {formatDate(v.actualArrival)}</span>
+                    <span className="text-[var(--muted)]">Out: {formatDate(v.actualDeparture)}</span>
+                  </div>
+
+                  {v.stops.length > 0 && (
+                    <div className="mt-3 rounded-lg bg-slate-50 p-3">
+                      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">Building Stops</p>
+                      <div className="space-y-1.5">
+                        {v.stops.map((stop, i) => (
+                          <div key={stop.id} className="flex items-center gap-3 text-xs">
+                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--brand)] text-[10px] font-bold text-white">
+                              {i + 1}
+                            </span>
+                            <MapPin className="h-3 w-3 text-slate-400" />
+                            <span className="font-medium">{stop.department.name}</span>
+                            {stop.building && <span className="text-[var(--muted)]">({stop.building})</span>}
+                            <span className="text-[var(--muted)]">{formatDate(stop.checkedInAt)}</span>
+                            {stop.checkedOutAt ? (
+                              <span className="text-emerald-600">→ {formatDate(stop.checkedOutAt)}</span>
+                            ) : (
+                              <Badge tone="green">Currently here</Badge>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </Card>
