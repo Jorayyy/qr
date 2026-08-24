@@ -1,11 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
-import { useRouter } from "next/navigation";
-import { Card, CardHeader, Input, Select, Button, Badge } from "@/components/ui";
+import { useActionState, useRef, useEffect, useState } from "react";
+import { Card, CardHeader, Input, Select, Button } from "@/components/ui";
 import { registerVisitorAction, type ActionState } from "@/lib/actions/visitors";
-import { QrCode, ArrowLeft, CheckCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle, Download, Printer } from "lucide-react";
 import Link from "next/link";
+import QRCode from "qrcode";
 
 const ID_TYPES = [
   { value: "SSS", label: "SSS" },
@@ -24,8 +24,75 @@ const PURPOSES = [
   { value: "OTHER", label: "Other" },
 ] as const;
 
+function QRCodeDisplay({ qrString, visitorName }: { qrString: string; visitorName: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [dataUrl, setDataUrl] = useState("");
+
+  useEffect(() => {
+    if (canvasRef.current && qrString) {
+      QRCode.toCanvas(canvasRef.current, qrString, {
+        width: 256,
+        margin: 2,
+        color: { dark: "#1e293b", light: "#ffffff" },
+      });
+      QRCode.toDataURL(qrString, {
+        width: 256,
+        margin: 2,
+        color: { dark: "#1e293b", light: "#ffffff" },
+      }).then(setDataUrl);
+    }
+  }, [qrString]);
+
+  function downloadQR() {
+    const link = document.createElement("a");
+    link.download = `QR-${visitorName.replace(/\s+/g, "-")}-${qrString}.png`;
+    link.href = dataUrl;
+    link.click();
+  }
+
+  function printQR() {
+    const win = window.open("", "_blank");
+    if (win) {
+      win.document.write(`
+        <html><head><title>QR Code - ${visitorName}</title>
+        <style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:sans-serif;flex-direction:column;}
+        .info{text-align:center;margin-top:16px;}.name{font-size:18px;font-weight:bold;}.code{font-size:12px;color:#666;margin-top:4px;}</style>
+        </head><body>
+        <img src="${dataUrl}" width="256" height="256" />
+        <div class="info"><div class="name">${visitorName}</div><div class="code">${qrString}</div></div>
+        </body></html>
+      `);
+      win.document.close();
+      win.print();
+    }
+  }
+
+  return (
+    <div className="flex flex-col items-center">
+      <canvas ref={canvasRef} className="hidden" />
+      {dataUrl && (
+        <>
+          <div className="rounded-xl border-2 border-[var(--brand)] bg-white p-4 shadow-sm">
+            <img src={dataUrl} alt={`QR Code for ${visitorName}`} width={256} height={256} />
+          </div>
+          <p className="mt-3 font-mono text-xs text-[var(--muted)] break-all max-w-[280px] text-center">{qrString}</p>
+          <div className="mt-4 flex gap-3">
+            <Button variant="secondary" onClick={downloadQR}>
+              <Download className="h-4 w-4" />
+              Download
+            </Button>
+            <Button variant="secondary" onClick={printQR}>
+              <Printer className="h-4 w-4" />
+              Print
+            </Button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function RegisterVisitorPage() {
-  const router = useRouter();
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     registerVisitorAction,
     { success: false, message: "" }
@@ -42,25 +109,25 @@ export default function RegisterVisitorPage() {
           </div>
           <h2 className="text-lg font-bold">Visitor Registered!</h2>
           <p className="mt-1 text-sm text-[var(--muted)]">
-            Share this QR code with the visitor for check-in.
+            Show or send this QR code to the visitor. They can use it at any check-in station.
           </p>
 
-          <div className="mx-auto mt-6 flex h-48 w-48 items-center justify-center rounded-xl border-2 border-dashed border-[var(--brand)] bg-blue-50">
-            <div className="text-center">
-              <QrCode className="mx-auto h-12 w-12 text-[var(--brand)]" />
-              <p className="mt-2 font-mono text-xs font-bold break-all px-2">{state.data.qrCode}</p>
-            </div>
+          <div className="mt-6">
+            <QRCodeDisplay
+              qrString={state.data.qrCode}
+              visitorName={state.data.visitorId}
+            />
           </div>
 
           <div className="mt-6 flex gap-3 justify-center">
             <Link href="/dashboard">
               <Button variant="secondary">
                 <ArrowLeft className="h-4 w-4" />
-                Back to Dashboard
+                Dashboard
               </Button>
             </Link>
-            <Link href="/visitors">
-              <Button>View All Visitors</Button>
+            <Link href="/visitors/register">
+              <Button>Register Another</Button>
             </Link>
           </div>
         </Card>
@@ -77,7 +144,7 @@ export default function RegisterVisitorPage() {
       </div>
 
       <Card>
-        <CardHeader title="Register Visitor" subtitle="Fill in the visitor details to generate a QR code" />
+        <CardHeader title="Register Visitor" subtitle="Fill in details to generate a scannable QR code" />
 
         <form action={formAction} className="space-y-6 p-5">
           {state.message && !state.success && (
