@@ -169,18 +169,18 @@ export default function RegisterVisitorPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="label">Email</label>
+              <label className="label">Email (Optional)</label>
               <Input name="email" type="email" />
             </div>
             <div>
-              <label className="label">Phone</label>
+              <label className="label">Phone (Optional)</label>
               <Input name="phone" type="tel" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="label">Company / School</label>
+              <label className="label">Company / School (Optional)</label>
               <Input name="company" />
             </div>
             <div>
@@ -197,7 +197,7 @@ export default function RegisterVisitorPage() {
           </div>
 
           <div>
-            <label className="label">ID Number</label>
+            <label className="label">ID Number (Optional)</label>
             <Input name="idNumber" />
           </div>
 
@@ -228,17 +228,17 @@ export default function RegisterVisitorPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="label">Host Name</label>
+              <label className="label">Host Name (Optional)</label>
               <Input name="hostName" />
             </div>
             <div>
-              <label className="label">Host Department</label>
+              <label className="label">Host Department (Optional)</label>
               <Input name="hostDepartment" />
             </div>
           </div>
 
           <div>
-            <label className="label">Notes</label>
+            <label className="label">Notes (Optional)</label>
             <Input name="notes" />
           </div>
 
