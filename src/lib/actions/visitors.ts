@@ -129,12 +129,17 @@ export async function checkInAction(visitId: string) {
 
 export async function checkOutAction(visitId: string) {
   try {
+    const now = new Date();
     await db.visit.update({
       where: { id: visitId },
       data: {
         status: "CHECKED_OUT",
-        actualDeparture: new Date(),
+        actualDeparture: now,
       },
+    });
+    await db.visitStop.updateMany({
+      where: { visitId, checkedOutAt: null },
+      data: { checkedOutAt: now },
     });
 
     revalidatePath("/dashboard");

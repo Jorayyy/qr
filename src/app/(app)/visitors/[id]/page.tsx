@@ -111,6 +111,8 @@ export default async function VisitorDetailPage({
                             <span className="text-[var(--muted)]">{formatDate(stop.checkedInAt)}</span>
                             {stop.checkedOutAt ? (
                               <span className="text-emerald-600">→ {formatDate(stop.checkedOutAt)}</span>
+                            ) : v.status === "CHECKED_OUT" ? (
+                              <span className="text-[var(--muted)]">→ Left with visit</span>
                             ) : (
                               <Badge tone="green">Currently here</Badge>
                             )}
