@@ -9,13 +9,13 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-4">
       {state?.error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
+        <div className="rounded-xl border border-red-400/30 bg-red-500/20 px-3 py-2 text-xs font-medium text-red-200">
           {state.error}
         </div>
       ) : null}
 
       <div>
-        <label htmlFor="email" className="label">
+        <label htmlFor="email" className="mb-1 block text-xs font-semibold uppercase tracking-wider text-white/60">
           Email
         </label>
         <input
@@ -25,12 +25,12 @@ export function LoginForm() {
           required
           autoComplete="email"
           placeholder="you@university.edu"
-          className="field"
+          className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/30 backdrop-blur-sm focus:border-white/30 focus:bg-white/15 focus:ring-2 focus:ring-white/10 focus:outline-none"
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="label">
+        <label htmlFor="password" className="mb-1 block text-xs font-semibold uppercase tracking-wider text-white/60">
           Password
         </label>
         <input
@@ -40,14 +40,14 @@ export function LoginForm() {
           required
           autoComplete="current-password"
           placeholder="Enter your password"
-          className="field"
+          className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/30 backdrop-blur-sm focus:border-white/30 focus:bg-white/15 focus:ring-2 focus:ring-white/10 focus:outline-none"
         />
       </div>
 
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--brand)] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[var(--brand-strong)] disabled:opacity-50 disabled:pointer-events-none"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--brand)] px-3 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:bg-[var(--brand-strong)] hover:shadow-blue-500/40 disabled:opacity-50 disabled:pointer-events-none"
       >
         {pending ? (
           <>
