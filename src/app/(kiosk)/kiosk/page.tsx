@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { QrCode, UserPlus, ScanLine } from "lucide-react";
 import Link from "next/link";
 
@@ -12,12 +11,12 @@ export default function KioskPage() {
       </div>
 
       <h1 className="mb-2 text-4xl font-bold">Visitor Management</h1>
-      <p className="mb-12 text-lg text-blue-100">Welcome to the university. Please register below.</p>
+      <p className="mb-12 text-lg text-white/70">Welcome to the university. Please register below.</p>
 
       <div className="grid w-full max-w-md gap-4">
         <Link
           href="/kiosk/register"
-          className="flex items-center gap-4 rounded-2xl bg-white p-6 text-blue-800 shadow-xl transition hover:scale-105 hover:shadow-2xl"
+          className="flex items-center gap-4 rounded-2xl bg-white p-6 text-gray-800 shadow-xl transition hover:scale-105 hover:shadow-2xl"
         >
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-blue-100">
             <UserPlus className="h-7 w-7 text-blue-600" />
@@ -30,19 +29,19 @@ export default function KioskPage() {
 
         <Link
           href="/kiosk/scan"
-          className="flex items-center gap-4 rounded-2xl bg-white/10 p-6 text-white backdrop-blur transition hover:bg-white/20"
+          className="flex items-center gap-4 rounded-2xl bg-white/15 p-6 text-white backdrop-blur transition hover:bg-white/25"
         >
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/20">
             <ScanLine className="h-7 w-7" />
           </div>
           <div>
             <p className="text-lg font-bold">Already have a QR code?</p>
-            <p className="text-sm text-blue-200">Show it at the guard station</p>
+            <p className="text-sm text-white/70">Show it at the guard station</p>
           </div>
         </Link>
       </div>
 
-      <p className="mt-12 text-xs text-blue-300">Touch screen to begin</p>
+      <p className="mt-12 text-xs text-white/50">Touch screen to begin</p>
     </div>
   );
 }

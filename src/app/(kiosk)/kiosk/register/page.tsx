@@ -86,7 +86,7 @@ export default function KioskRegisterPage() {
           <CheckCircle className="h-8 w-8 text-white" />
         </div>
         <h1 className="mb-2 text-3xl font-bold">You&apos;re Registered!</h1>
-        <p className="mb-8 text-blue-100">Show this QR code at each building entrance.</p>
+        <p className="mb-8 text-white/70">Show this QR code at each building entrance.</p>
 
         <QRCodeDisplay qrString={state.data.qrCode} />
 
@@ -102,14 +102,14 @@ export default function KioskRegisterPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-start overflow-y-auto p-4 py-8 text-white md:p-8">
-      <Link href="/kiosk" className="mb-6 flex items-center gap-2 text-blue-200 hover:text-white self-start">
+      <Link href="/kiosk" className="mb-6 flex items-center gap-2 text-white/70 hover:text-white self-start">
         <ArrowLeft className="h-5 w-5" />
         Back
       </Link>
 
       <div className="w-full max-w-lg">
         <h1 className="mb-2 text-3xl font-bold">Visitor Registration</h1>
-        <p className="mb-6 text-blue-100">Fill in your details to get a QR access pass.</p>
+        <p className="mb-6 text-white/70">Fill in your details to get a QR access pass.</p>
 
         <form action={formAction} className="space-y-5">
           {state.message && !state.success && (
@@ -118,33 +118,33 @@ export default function KioskRegisterPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-bold text-blue-100">First Name *</label>
+              <label className="mb-1 block text-sm font-bold text-white/70">First Name *</label>
               <input name="firstName" required className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Juan" />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-bold text-blue-100">Last Name *</label>
+              <label className="mb-1 block text-sm font-bold text-white/70">Last Name *</label>
               <input name="lastName" required className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Dela Cruz" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-bold text-blue-100">Phone (Optional)</label>
+              <label className="mb-1 block text-sm font-bold text-white/70">Phone (Optional)</label>
               <input name="phone" type="tel" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="09XX XXX XXXX" />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-bold text-blue-100">Email (Optional)</label>
+              <label className="mb-1 block text-sm font-bold text-white/70">Email (Optional)</label>
               <input name="email" type="email" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="you@email.com" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-bold text-blue-100">Company / School (Optional)</label>
+              <label className="mb-1 block text-sm font-bold text-white/70">Company / School (Optional)</label>
               <input name="company" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="University of..." />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-bold text-blue-100">ID Type *</label>
+              <label className="mb-1 block text-sm font-bold text-white/70">ID Type *</label>
               <select name="idType" required className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none">
                 <option value="" className="text-gray-900">Select ID type</option>
                 {ID_TYPES.map((t) => (
@@ -155,13 +155,13 @@ export default function KioskRegisterPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-bold text-blue-100">ID Number (Optional)</label>
+            <label className="mb-1 block text-sm font-bold text-white/70">ID Number (Optional)</label>
             <input name="idNumber" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="123456789" />
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-bold text-blue-100">Department Visiting *</label>
+              <label className="mb-1 block text-sm font-bold text-white/70">Department Visiting *</label>
               <select name="departmentId" required className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none">
                 <option value="" className="text-gray-900">Select department</option>
                 {departments.map((d) => (
@@ -170,7 +170,7 @@ export default function KioskRegisterPage() {
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-bold text-blue-100">Purpose *</label>
+              <label className="mb-1 block text-sm font-bold text-white/70">Purpose *</label>
               <select name="purpose" required className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none">
                 <option value="" className="text-gray-900">Select purpose</option>
                 {PURPOSES.map((p) => (
@@ -182,11 +182,11 @@ export default function KioskRegisterPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-bold text-blue-100">Host Name (Optional)</label>
+              <label className="mb-1 block text-sm font-bold text-white/70">Host Name (Optional)</label>
               <input name="hostName" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Prof. Dela Cruz" />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-bold text-blue-100">Host Department (Optional)</label>
+              <label className="mb-1 block text-sm font-bold text-white/70">Host Department (Optional)</label>
               <input name="hostDepartment" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Computer Science" />
             </div>
           </div>

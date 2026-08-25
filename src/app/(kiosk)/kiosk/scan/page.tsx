@@ -116,12 +116,12 @@ export default function KioskScanPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center p-4 text-white md:p-8">
-      <Link href="/kiosk" className="mb-6 flex items-center gap-2 self-start text-blue-200 hover:text-white">
+      <Link href="/kiosk" className="mb-6 flex items-center gap-2 self-start text-white/70 hover:text-white">
         <ArrowLeft className="h-5 w-5" /> Back
       </Link>
 
       <h1 className="mb-2 text-3xl font-bold">Check In</h1>
-      <p className="mb-8 text-blue-100">Scan your QR code or enter it manually.</p>
+      <p className="mb-8 text-white/70">Scan your QR code or enter it manually.</p>
 
       <div className="flex gap-3 mb-6">
         <button onClick={() => { setMode("camera"); startCamera(); }} className={`rounded-xl px-6 py-3 font-bold transition ${mode === "camera" ? "bg-white text-blue-700" : "bg-white/10 text-white hover:bg-white/20"}`}>
@@ -137,8 +137,8 @@ export default function KioskScanPage() {
           <div id="kiosk-qr-reader" className="w-full overflow-hidden rounded-xl" />
           {!cameraActive && !result && (
             <div className="flex flex-col items-center py-12 text-center">
-              <Camera className="mb-3 h-12 w-12 text-blue-300" />
-              <p className="text-blue-200">Camera not available</p>
+              <Camera className="mb-3 h-12 w-12 text-white/50" />
+              <p className="text-white/70">Camera not available</p>
               <button onClick={startCamera} className="mt-3 rounded-xl bg-white/20 px-6 py-2 font-bold">Try Again</button>
             </div>
           )}
