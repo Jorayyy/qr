@@ -6,8 +6,8 @@ import Link from "next/link";
 export default function KioskPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-8 text-white">
-      <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-2xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl">
-        <QrCode className="h-10 w-10 text-white" />
+      <div className="mb-8 flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl">
+        <img src="/logo.png" alt="EVSU Logo" className="h-full w-full object-contain p-1" />
       </div>
 
       <h1 className="mb-2 text-4xl font-bold drop-shadow-lg">Visitor Management</h1>
