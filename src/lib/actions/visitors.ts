@@ -21,6 +21,9 @@ export type RegisterVisitorInput = {
   purpose: string;
   hostName?: string;
   hostDepartment?: string;
+  vehicleType?: string;
+  vehicleModel?: string;
+  vehiclePlateNumber?: string;
   notes?: string;
 };
 
@@ -54,6 +57,9 @@ export async function registerVisitorAction(
   const purpose = formData.get("purpose") as string;
   const hostName = (formData.get("hostName") as string) || undefined;
   const hostDepartment = (formData.get("hostDepartment") as string) || undefined;
+  const vehicleType = (formData.get("vehicleType") as string) || undefined;
+  const vehicleModel = (formData.get("vehicleModel") as string) || undefined;
+  const vehiclePlateNumber = (formData.get("vehiclePlateNumber") as string) || undefined;
   const notes = (formData.get("notes") as string) || undefined;
 
   if (!firstName || !lastName || !departmentId || !purpose) {
@@ -87,6 +93,9 @@ export async function registerVisitorAction(
         qrCode,
         hostName,
         hostDepartment,
+        vehicleType,
+        vehicleModel,
+        vehiclePlateNumber,
         notes,
       },
     });

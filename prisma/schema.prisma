@@ -107,6 +107,8 @@ model Visit {
   actualDeparture    DateTime?
   hostName           String?
   hostDepartment     String?
+  vehicleType        String?
+  vehicleModel       String?
   vehiclePlateNumber String?
   qrCode             String      @unique
   notes              String?

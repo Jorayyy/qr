@@ -2,7 +2,18 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { Card, CardHeader, Badge, Button, EmptyState, PageHeader } from "@/components/ui";
-import { ArrowLeft, Mail, Phone, Building2, CreditCard, MapPin } from "lucide-react";
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  Building2,
+  CreditCard,
+  MapPin,
+  User,
+  Car,
+  QrCode,
+  Clock,
+} from "lucide-react";
 
 function formatDate(d: Date | null) {
   if (!d) return "—";
@@ -13,6 +24,19 @@ function formatDate(d: Date | null) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function formatDuration(start: Date | null, end: Date | null): string {
+  if (!start) return "—";
+  const endTime = end ? new Date(end).getTime() : Date.now();
+  const diffMs = endTime - new Date(start).getTime();
+  if (diffMs < 0) return "—";
+  const totalMinutes = Math.floor(diffMs / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours === 0) return `${minutes}m`;
+  if (minutes === 0) return `${hours}h`;
+  return `${hours}h ${minutes}m`;
 }
 
 const STATUS_BADGE: Record<string, { tone: "blue" | "green" | "red" | "gray" }> = {
@@ -87,18 +111,59 @@ export default async function VisitorDetailPage({
             <div className="divide-y divide-[var(--border)]">
               {visitor.visits.map((v) => (
                 <div key={v.id} className="p-5">
+                  {/* Header row: date, dept, purpose, status */}
                   <div className="flex flex-wrap items-center gap-4 text-sm">
                     <span className="font-medium">{formatDate(v.createdAt)}</span>
                     <span className="text-[var(--muted)]">{v.department.name}</span>
                     <span className="text-[var(--muted)]">{v.purpose.replace("_", " ")}</span>
                     <Badge tone={STATUS_BADGE[v.status]?.tone}>{v.status.replace("_", " ")}</Badge>
-                    <span className="text-[var(--muted)]">In: {formatDate(v.actualArrival)}</span>
-                    <span className="text-[var(--muted)]">Out: {formatDate(v.actualDeparture)}</span>
                   </div>
 
+                  {/* Check-in/out + duration */}
+                  <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-[var(--muted)]">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      In: {formatDate(v.actualArrival)}
+                    </span>
+                    <span>Out: {formatDate(v.actualDeparture)}</span>
+                    {v.actualArrival && (
+                      <span className="font-medium text-[var(--foreground)]">
+                        Duration: {formatDuration(v.actualArrival, v.actualDeparture)}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Host + Vehicle info */}
+                  {(v.hostName || v.hostDepartment || v.vehicleType || v.vehicleModel || v.vehiclePlateNumber) && (
+                    <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-xs">
+                      {v.hostName && (
+                        <span className="flex items-center gap-1 text-[var(--muted)]">
+                          <User className="h-3 w-3" />
+                          Host: {v.hostName}
+                          {v.hostDepartment && ` (${v.hostDepartment})`}
+                        </span>
+                      )}
+                      {(v.vehicleType || v.vehicleModel || v.vehiclePlateNumber) && (
+                        <span className="flex items-center gap-1 text-[var(--muted)]">
+                          <Car className="h-3 w-3" />
+                          Vehicle: {[v.vehicleType, v.vehicleModel, v.vehiclePlateNumber].filter(Boolean).join(" — ")}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* QR code reference */}
+                  <div className="mt-2 flex items-center gap-1 text-xs text-[var(--muted)]">
+                    <QrCode className="h-3 w-3" />
+                    <span className="font-mono">{v.qrCode}</span>
+                  </div>
+
+                  {/* Building stops */}
                   {v.stops.length > 0 && (
                     <div className="mt-3 rounded-lg bg-slate-50 p-3">
-                      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">Building Stops</p>
+                      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+                        Building Stops ({v.stops.length})
+                      </p>
                       <div className="space-y-1.5">
                         {v.stops.map((stop, i) => (
                           <div key={stop.id} className="flex items-center gap-3 text-xs">
@@ -110,7 +175,12 @@ export default async function VisitorDetailPage({
                             {stop.building && <span className="text-[var(--muted)]">({stop.building})</span>}
                             <span className="text-[var(--muted)]">{formatDate(stop.checkedInAt)}</span>
                             {stop.checkedOutAt ? (
-                              <span className="text-emerald-600">→ {formatDate(stop.checkedOutAt)}</span>
+                              <span className="text-emerald-600">
+                                → {formatDate(stop.checkedOutAt)}
+                                <span className="ml-1 text-[var(--muted)]">
+                                  ({formatDuration(stop.checkedInAt, stop.checkedOutAt)})
+                                </span>
+                              </span>
                             ) : v.status === "CHECKED_OUT" ? (
                               <span className="text-[var(--muted)]">→ Left with visit</span>
                             ) : (

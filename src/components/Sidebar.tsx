@@ -7,6 +7,7 @@ import {
   Users,
   LogOut,
   ScanLine,
+  Building2,
 } from "lucide-react";
 import { cx, buttonClass } from "@/components/ui";
 import { logoutAction } from "@/lib/actions/auth";
@@ -17,6 +18,10 @@ const NAV_ITEMS = [
   { href: "/scanner", label: "Scan QR", icon: ScanLine },
 ] as const;
 
+const ADMIN_ITEMS = [
+  { href: "/departments", label: "Departments", icon: Building2 },
+] as const;
+
 type SidebarProps = {
   userName?: string;
   userRole?: string;
@@ -24,6 +29,7 @@ type SidebarProps = {
 
 export function Sidebar({ userName, userRole }: SidebarProps) {
   const pathname = usePathname();
+  const isAdmin = userRole === "ADMIN";
 
   return (
     <aside className="no-print flex w-60 flex-col border-r border-[var(--border)] bg-white">
@@ -54,6 +60,34 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
             </Link>
           );
         })}
+
+        {isAdmin && (
+          <>
+            <div className="my-2 border-t border-[var(--border)]" />
+            <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
+              Admin
+            </p>
+            {ADMIN_ITEMS.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cx(
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+                    isActive
+                      ? "bg-blue-50 text-[var(--brand)]"
+                      : "text-slate-600 hover:bg-blue-50 hover:text-[var(--brand)]"
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </>
+        )}
       </nav>
 
       <div className="border-t border-[var(--border)] px-4 py-3">

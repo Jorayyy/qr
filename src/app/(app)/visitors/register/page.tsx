@@ -237,6 +237,21 @@ export default function RegisterVisitorPage() {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div>
+              <label className="label">Vehicle Type (Optional)</label>
+              <Input name="vehicleType" placeholder="e.g. Sedan, SUV, Motorcycle" />
+            </div>
+            <div>
+              <label className="label">Vehicle Model (Optional)</label>
+              <Input name="vehicleModel" placeholder="e.g. Toyota Vios" />
+            </div>
+            <div>
+              <label className="label">Plate Number (Optional)</label>
+              <Input name="vehiclePlateNumber" placeholder="e.g. ABC 1234" />
+            </div>
+          </div>
+
           <div>
             <label className="label">Notes (Optional)</label>
             <Input name="notes" />

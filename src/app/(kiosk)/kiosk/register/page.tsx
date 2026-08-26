@@ -191,6 +191,21 @@ export default function KioskRegisterPage() {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div>
+              <label className="mb-1 block text-sm font-bold text-white/70">Vehicle Type (Optional)</label>
+              <input name="vehicleType" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Sedan, SUV, Motorcycle" />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-bold text-white/70">Vehicle Model (Optional)</label>
+              <input name="vehicleModel" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Toyota Vios" />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-bold text-white/70">Plate Number (Optional)</label>
+              <input name="vehiclePlateNumber" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="ABC 1234" />
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={pending}
