@@ -200,3 +200,19 @@ export async function checkOutStopAction(stopId: string) {
     return { success: false, message: "Failed to check out stop." };
   }
 }
+
+export async function deleteVisitorAction(visitorId: string) {
+  try {
+    await db.visitStop.deleteMany({
+      where: { visit: { visitorId } },
+    });
+    await db.visit.deleteMany({ where: { visitorId } });
+    await db.visitor.delete({ where: { id: visitorId } });
+
+    revalidatePath("/visitors");
+    revalidatePath("/dashboard");
+    return { success: true, message: "Visitor deleted." };
+  } catch {
+    return { success: false, message: "Failed to delete visitor." };
+  }
+}

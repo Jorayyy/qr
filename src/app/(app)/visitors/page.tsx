@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { PageHeader, Button, Card, Badge, EmptyState, Input } from "@/components/ui";
-import { Plus, Search, Eye } from "lucide-react";
+import { Plus, Search } from "lucide-react";
+import { DeleteVisitorButton } from "./actions-client";
 
 export default async function VisitorsPage({
   searchParams,
@@ -68,7 +69,7 @@ export default async function VisitorsPage({
                   <th className="px-5 py-3">Company</th>
                   <th className="px-5 py-3">ID Type</th>
                   <th className="px-5 py-3">Total Visits</th>
-                  <th className="px-5 py-3"></th>
+                  <th className="px-5 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border)]">
@@ -85,11 +86,14 @@ export default async function VisitorsPage({
                     </td>
                     <td className="px-5 py-3 text-center font-medium">{v.visits.length}</td>
                     <td className="px-5 py-3">
-                      <Link href={`/visitors/${v.id}`}>
-                        <Button variant="ghost" className="text-[var(--brand)]">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </Link>
+                      <div className="flex items-center justify-end gap-1">
+                        <Link href={`/visitors/${v.id}`}>
+                          <Button variant="secondary" className="text-xs">
+                            View
+                          </Button>
+                        </Link>
+                        <DeleteVisitorButton visitorId={v.id} />
+                      </div>
                     </td>
                   </tr>
                 ))}
