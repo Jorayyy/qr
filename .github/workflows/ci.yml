@@ -13,7 +13,7 @@ jobs:
       SESSION_SECRET: ci-session-secret-ci-session-secret-1234
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vms_ci
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:
