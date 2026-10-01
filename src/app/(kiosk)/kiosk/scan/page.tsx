@@ -1,10 +1,21 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { ArrowLeft, Camera, Keyboard, CheckCircle, XCircle, LogIn, QrCode, X } from "lucide-react";
+import { ArrowLeft, Camera, Keyboard, CheckCircle, XCircle, LogIn } from "lucide-react";
 import Link from "next/link";
+import type { Html5Qrcode } from "html5-qrcode";
 
-function formatDate(d: Date | string | null) {
+type KioskVisitResult = {
+  id: string;
+  status?: string;
+  purpose?: string;
+  actualArrival?: string | null;
+  visitor?: { firstName?: string } | null;
+  department?: { name?: string } | null;
+  stops?: unknown[];
+};
+
+function formatDate(d?: Date | string | null) {
   if (!d) return "—";
   return new Date(d).toLocaleString("en-US", {
     month: "short",
@@ -17,18 +28,18 @@ function formatDate(d: Date | string | null) {
 export default function KioskScanPage() {
   const [mode, setMode] = useState<"camera" | "manual">("camera");
   const [qrInput, setQrInput] = useState("");
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<KioskVisitResult | null>(null);
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
   const [cameraActive, setCameraActive] = useState(false);
   const [loading, setLoading] = useState(false);
-  const html5QrCodeRef = useRef<any>(null);
+  const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
 
   const stopCamera = useCallback(() => {
     if (html5QrCodeRef.current) {
       try {
-        html5QrCodeRef.current.stop().catch(() => {});
-        html5QrCodeRef.current.clear().catch(() => {});
+        Promise.resolve(html5QrCodeRef.current.stop()).catch(() => {});
+        Promise.resolve(html5QrCodeRef.current.clear()).catch(() => {});
       } catch {}
       html5QrCodeRef.current = null;
     }
@@ -64,7 +75,7 @@ export default function KioskScanPage() {
     try {
       const { Html5Qrcode } = await import("html5-qrcode");
       if (html5QrCodeRef.current) {
-        try { html5QrCodeRef.current.stop().catch(() => {}); html5QrCodeRef.current.clear().catch(() => {}); } catch {}
+        try { Promise.resolve(html5QrCodeRef.current.stop()).catch(() => {}); Promise.resolve(html5QrCodeRef.current.clear()).catch(() => {}); } catch {}
       }
       const scanner = new Html5Qrcode("kiosk-qr-reader");
       html5QrCodeRef.current = scanner;
@@ -82,7 +93,11 @@ export default function KioskScanPage() {
   }, [lookupVisit, stopCamera]);
 
   useEffect(() => {
-    if (mode === "camera" && !result) startCamera();
+    if (mode === "camera" && !result) {
+      // Camera startup is an external-system interaction.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      startCamera();
+    }
     return () => { stopCamera(); };
   }, [mode]);
 
@@ -170,7 +185,7 @@ export default function KioskScanPage() {
       {result && (
         <div className="mt-6 w-full max-w-md rounded-2xl bg-white p-6 text-gray-900 shadow-2xl">
           <div className="mb-4 text-center">
-            <p className="text-lg font-bold">{result.visitor?.firstName} {result.visitor?.lastName}</p>
+            <p className="text-lg font-bold">{result.visitor?.firstName}</p>
             <p className="text-sm text-gray-500">{result.department?.name} · {result.purpose?.replace("_", " ")}</p>
           </div>
 

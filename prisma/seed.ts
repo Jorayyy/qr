@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { hashSync } from "bcryptjs";
-import { createHash } from "crypto";
+import { hash } from "@node-rs/argon2";
+import { createHash, randomBytes } from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -8,31 +8,60 @@ function qrHash(input: string): string {
   return createHash("sha256").update(input).digest("hex").slice(0, 32);
 }
 
+// @node-rs/argon2 defaults to Argon2id with these OWASP-recommended costs.
+const ARGON2_OPTIONS = {
+  memoryCost: 19456,
+  timeCost: 2,
+  parallelism: 1,
+  outputLen: 32,
+} as const;
+
+function randomPassword(): string {
+  return randomBytes(18).toString("base64url");
+}
+
 async function main() {
   // ── Users ────────────────────────────────────────────────────────────────
+  // No hardcoded credentials: passwords come from the environment or are
+  // generated randomly and printed ONCE to this terminal during initial setup.
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? randomPassword();
+  const securityPassword = process.env.SEED_SECURITY_PASSWORD ?? randomPassword();
+  const generated: string[] = [];
+
   const admin = await prisma.user.upsert({
     where: { email: "admin@university.edu" },
     update: {},
     create: {
       email: "admin@university.edu",
-      passwordHash: hashSync("Admin@12345", 10),
+      passwordHash: await hash(adminPassword, ARGON2_OPTIONS),
       name: "System Administrator",
       role: "ADMIN",
+      mustChangePassword: true,
     },
   });
+  if (!process.env.SEED_ADMIN_PASSWORD) generated.push(`admin@university.edu — ${adminPassword}`);
 
   const security = await prisma.user.upsert({
     where: { email: "security@university.edu" },
     update: {},
     create: {
       email: "security@university.edu",
-      passwordHash: hashSync("Security@123", 10),
+      passwordHash: await hash(securityPassword, ARGON2_OPTIONS),
       name: "Security Officer",
       role: "SECURITY",
+      mustChangePassword: true,
     },
   });
+  if (!process.env.SEED_SECURITY_PASSWORD) generated.push(`security@university.edu — ${securityPassword}`);
+  void admin;
+  void security;
 
   console.log("✓ Users created");
+  if (generated.length > 0) {
+    console.log("\n⚠ ONE-TIME INITIAL CREDENTIALS (copy now, shown only once):");
+    for (const line of generated) console.log(`   ${line}`);
+    console.log("   Users are forced to change their password at first sign-in.\n");
+  }
 
   // ── Departments ──────────────────────────────────────────────────────────
   const departmentData = [

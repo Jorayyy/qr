@@ -48,16 +48,79 @@ enum QRTemplateType {
 // ─── Models ──────────────────────────────────────────────────────────────────
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String
-  name         String
-  role         UserRole @default(STAFF)
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  passwordHash       String
+  name               String
+  role               UserRole  @default(STAFF)
+  isActive           Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  passwordChangedAt  DateTime?
+  mustChangePassword Boolean   @default(false)
+  failedLogins       Int       @default(0)
+  lockedUntil        DateTime?
+  mfaEnabled         Boolean   @default(false)
+  mfaSecret          String?
+  mfaRecoveryCodes   String?
+  mfaEnrolledAt      DateTime?
+
+  sessions  Session[]
+  auditLogs AuditLog[]
 
   @@map("users")
+}
+
+model Session {
+  id                String    @id @default(uuid())
+  tokenHash         String    @unique
+  userId            String
+  createdAt         DateTime  @default(now())
+  lastSeenAt        DateTime  @default(now())
+  idleExpiresAt     DateTime
+  absoluteExpiresAt DateTime
+  revokedAt         DateTime?
+  mfaPending        Boolean   @default(false)
+  ip                String?
+  userAgent         String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([absoluteExpiresAt])
+  @@map("sessions")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  actorId    String?
+  actorEmail String?
+  action     String
+  targetType String?
+  targetId   String?
+  result     String
+  ip         String?
+  userAgent  String?
+  requestId  String?
+  meta       Json?
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([action])
+  @@index([actorId])
+  @@map("audit_logs")
+}
+
+model RateLimit {
+  key         String
+  windowStart DateTime
+  count       Int      @default(0)
+
+  @@id([key, windowStart])
+  @@index([windowStart])
+  @@map("rate_limits")
 }
 
 model Department {
@@ -111,6 +174,10 @@ model Visit {
   vehicleModel       String?
   vehiclePlateNumber String?
   qrCode             String      @unique
+  qrExpiresAt        DateTime?
+  qrRevokedAt        DateTime?
+  checkedInById       String?
+  checkedOutById      String?
   notes              String?
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt

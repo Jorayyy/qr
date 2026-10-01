@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requirePermission } from "@/lib/auth";
 import { Card, CardHeader, Badge, PageHeader, Button, EmptyState } from "@/components/ui";
 import { Users, UserCheck, UserX, Clock, QrCode, Plus } from "lucide-react";
 
@@ -21,6 +22,8 @@ const STATUS_BADGE: Record<string, { tone: "blue" | "green" | "red" | "gray" }> 
 };
 
 export default async function DashboardPage() {
+  await requirePermission("visit:read");
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 

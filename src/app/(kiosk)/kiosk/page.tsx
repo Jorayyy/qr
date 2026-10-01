@@ -1,6 +1,6 @@
 "use client";
 
-import { QrCode, UserPlus, ScanLine } from "lucide-react";
+import { UserPlus, ScanLine } from "lucide-react";
 import Link from "next/link";
 
 export default function KioskPage() {

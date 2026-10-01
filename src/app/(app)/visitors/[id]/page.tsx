@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { Card, CardHeader, Badge, Button, EmptyState, PageHeader } from "@/components/ui";
+import { getRequestContext, requirePermission } from "@/lib/auth";
+import { recordAudit } from "@/lib/audit";
+import { Card, CardHeader, Badge, EmptyState, PageHeader } from "@/components/ui";
 import {
-  ArrowLeft,
   Mail,
   Phone,
   Building2,
@@ -52,6 +53,8 @@ export default async function VisitorDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const user = await requirePermission("visitor:read");
+
   const visitor = await db.visitor.findUnique({
     where: { id },
     include: {
@@ -66,6 +69,20 @@ export default async function VisitorDetailPage({
   });
 
   if (!visitor) notFound();
+
+  // Audit access to a visitor's personal record (PII).
+  const ctx = await getRequestContext();
+  await recordAudit({
+    actorId: user.userId,
+    actorEmail: user.email,
+    action: "VISITOR_VIEWED",
+    result: "SUCCESS",
+    targetType: "visitor",
+    targetId: visitor.id,
+    ip: ctx.ip,
+    userAgent: ctx.userAgent,
+    requestId: ctx.requestId,
+  });
 
   return (
     <div>

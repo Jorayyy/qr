@@ -1,10 +1,18 @@
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
+import { safeCallbackUrl } from "@/lib/validation";
 import { LoginForm } from "./login-form";
 
-export default async function LoginPage() {
-  const user = await getSessionUser();
-  if (user) redirect("/dashboard");
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
+  const { callbackUrl } = await searchParams;
+  const safeCallback = safeCallbackUrl(callbackUrl);
+
+  const user = await getSession();
+  if (user) redirect(safeCallback ?? "/dashboard");
 
   return (
     <>
@@ -22,7 +30,7 @@ export default async function LoginPage() {
 
       <div className="rounded-2xl border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-xl">
         <h2 className="mb-4 text-sm font-bold tracking-tight text-white">Sign in to your account</h2>
-        <LoginForm />
+        <LoginForm callbackUrl={safeCallback ?? undefined} />
       </div>
 
       <a

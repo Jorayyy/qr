@@ -1,9 +1,8 @@
 "use client";
 
 import { useActionState, useState, useEffect, useRef } from "react";
-import { Card, CardHeader, Input, Select, Button } from "@/components/ui";
 import { registerVisitorAction, type ActionState } from "@/lib/actions/visitors";
-import { QrCode, ArrowLeft, CheckCircle, Building2 } from "lucide-react";
+import { ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import QRCode from "qrcode";
 

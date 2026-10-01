@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { getSessionUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { requirePermission } from "@/lib/auth";
 import EditDepartmentForm from "./form";
 
 export default async function EditDepartmentPage({
@@ -11,11 +10,7 @@ export default async function EditDepartmentPage({
 }) {
   const { id } = await params;
 
-  const session = await getSessionUser();
-  if (!session) redirect("/login");
-
-  const user = await db.user.findUnique({ where: { id: session.userId }, select: { role: true } });
-  if (user?.role !== "ADMIN") redirect("/dashboard");
+  await requirePermission("department:manage");
 
   const department = await db.department.findUnique({ where: { id } });
   if (!department) notFound();

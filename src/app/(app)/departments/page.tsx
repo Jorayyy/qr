@@ -1,17 +1,12 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { Card, CardHeader, Badge, Button, PageHeader, EmptyState } from "@/components/ui";
-import { Plus, Pencil, ToggleLeft, ToggleRight, Trash2 } from "lucide-react";
-import { getSessionUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { Card, Badge, Button, PageHeader, EmptyState } from "@/components/ui";
+import { Plus, Pencil } from "lucide-react";
+import { requirePermission } from "@/lib/auth";
 import { ToggleForm, DeleteForm } from "./actions-client";
 
 export default async function DepartmentsPage() {
-  const session = await getSessionUser();
-  if (!session) redirect("/login");
-
-  const user = await db.user.findUnique({ where: { id: session.userId }, select: { role: true } });
-  if (user?.role !== "ADMIN") redirect("/dashboard");
+  await requirePermission("department:manage");
 
   const departments = await db.department.findMany({
     orderBy: { name: "asc" },
