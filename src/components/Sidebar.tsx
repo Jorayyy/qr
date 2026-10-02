@@ -37,8 +37,8 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
   return (
     <aside className="no-print flex w-60 flex-col border-r border-[var(--border)] bg-white">
       <div className="flex h-14 items-center gap-2 border-b border-[var(--border)] px-5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--brand)] text-sm font-bold text-white">
-          VMS
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-[var(--border)]">
+          <img src="/logo.png" alt="EVSU Logo" className="h-full w-full object-contain" />
         </div>
         <span className="text-sm font-bold tracking-tight">Visitor Management</span>
       </div>
