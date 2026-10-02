@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 
 export function clientIp(req: NextRequest): string | null {
   const forwarded = req.headers.get("x-forwarded-for");

@@ -10,21 +10,22 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "seed": "tsx prisma/seed.ts",
     "purge": "tsx scripts/purge-retention.ts"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.2.1",
-    "@prisma/client": "^6.19.3",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
     "@tailwindcss/postcss": "^4",
     "bcryptjs": "^3.0.3",
+    "dotenv": "^18.0.5",
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^1.33.0",
     "next": "^16.3.8",
     "otpauth": "^9.5.2",
-    "prisma": "^6.19.3",
+    "pg": "^8.23.1",
+    "prisma": "^7.10.0",
     "qrcode": "^1.5.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^24.19.0",
+    "@types/pg": "^8.23.1",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -44,10 +46,13 @@
     "vitest": "^5.0.3"
   },
   "allowScripts": {
-    "prisma@6.19.3": true,
     "esbuild@0.28.2": true,
     "unrs-resolver@1.12.2": true,
-    "@prisma/engines@6.19.3": true,
-    "@prisma/client@6.19.3": true
+    "prisma@7.10.0": true,
+    "@prisma/engines@7.10.0": true
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.2",
+    "mysql2": "^3.24.5"
   }
 }

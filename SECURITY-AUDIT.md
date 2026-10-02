@@ -65,7 +65,7 @@ three RCE advisories).
 | `npm run lint` | ✅ 0 errors (6 warnings: `no-img-element` on local logos/QR images, 2 intentional camera-effect dep arrays) |
 | `npm test` | ✅ 53/53 passing |
 | `npm run build` | ✅ Next 16.3.8, all 20 routes + proxy |
-| `npm audit` | 3 high remaining — `deepmerge-ts` via `@prisma/config` via `prisma` CLI (**build-time only**, not shipped; fix would downgrade Prisma — accepted, see §5) |
+| `npm audit` | ✅ 0 vulnerabilities — Prisma-CLI-only highs (`deepmerge-ts`, `mysql2`) cleared with pinned `overrides` in `package.json`, verified against `prisma generate` / `validate` / `db push` / `migrate deploy` |
 
 ## 4. Production checklist
 
@@ -95,7 +95,7 @@ three RCE advisories).
 - [ ] Rotate `SESSION_SECRET` periodically (invalidates MFA secrets — coordinate: users must re-enroll, or keep stable and rely on rotation of individual accounts)
 - [ ] Review `/security?tab=audit` monthly; watch `LOGIN_FAILED` / `LOGIN_LOCKED` clusters
 - [ ] DB backups (Vercel/Postgres provider) — audit logs are append-only evidence
-- [ ] `npm audit` periodically; the 3 remaining highs are Prisma-CLI-only and drop away when Prisma ships a patched `@prisma/config`
+- [ ] `npm audit` periodically; currently 0 — if highs reappear via Prisma CLI deps, re-pin with `overrides` in `package.json` and re-verify the Prisma CLI commands
 
 ### Vercel/ops notes
 
@@ -105,7 +105,7 @@ three RCE advisories).
 
 ## 5. Accepted risks / limitations
 
-1. **Prisma CLI advisory** (`deepmerge-ts` in `@prisma/config`): development/build tooling only; not present in the server bundle. Fix requires a Prisma downgrade — deferred until upstream patches.
+1. **Prisma CLI advisories** (`deepmerge-ts` in `@prisma/config`, `mysql2` in `prisma`): development/build tooling only; never present in the server bundle. Both are now patched via `overrides` (`deepmerge-ts@^8.0.2`, `mysql2@^3.24.5`) — Prisma CLI commands re-verified after pinning; drop the overrides once Prisma ships the fixed versions itself.
 2. **CSP uses `'unsafe-inline'` for scripts**: required by Next.js inline bootstrap scripts without per-request nonce support in `headers()`; React escaping + no `dangerouslySetInnerHTML` + upgrade-insecure-requests keep the practical risk low. A per-request nonce via `proxy.ts` is a possible future upgrade.
 3. **Rate limits are per-instance memory + shared Postgres counters**: correct but eventually consistent across serverless instances (sub-second windows).
 4. **HIBP breached-password check fails open** on network errors (logged as `HIBP_UNAVAILABLE`) to avoid locking users out when the service is down.

@@ -40,6 +40,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ```bash
 npm install
 cp .env.example .env        # then fill in DATABASE_URL and SESSION_SECRET
+npx prisma generate         # generate the Prisma client (src/generated/prisma)
 npx prisma migrate deploy   # apply migrations
 npm run seed                # creates initial admin/security users
 npm run dev

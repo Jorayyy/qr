@@ -6,9 +6,12 @@
  * - sessions revoked/expired longer than SESSION_RETENTION_DAYS (default 30)
  * - rate_limits rows older than 24h (their windows are long gone)
  */
-import { PrismaClient } from "@prisma/client";
+import "dotenv/config";
+import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 function daysFromEnv(name: string, fallback: number): number {
   const raw = process.env[name];

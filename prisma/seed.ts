@@ -1,8 +1,11 @@
-import { PrismaClient } from "@prisma/client";
+import "dotenv/config";
+import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { hash } from "@node-rs/argon2";
 import { createHash, randomBytes } from "crypto";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 function qrHash(input: string): string {
   return createHash("sha256").update(input).digest("hex").slice(0, 32);
