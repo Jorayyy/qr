@@ -102,7 +102,7 @@ async function UsersSection({ actorId }: { actorId: string }) {
       <Card>
         <CardHeader title="Accounts" subtitle={`${users.length} total`} />
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[760px] text-left text-sm">
             <thead>
               <tr className="border-b border-[var(--border)] text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
                 <th className="px-5 py-3">User</th>
@@ -236,7 +236,7 @@ async function SessionsSection({ actorId }: { actorId: string }) {
         <EmptyState title="No active sessions" />
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[680px] text-left text-sm">
             <thead>
               <tr className="border-b border-[var(--border)] text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
                 <th className="px-5 py-3">User</th>
@@ -359,7 +359,7 @@ async function AuditSection({
         <EmptyState title="No audit entries" hint="Security-relevant events will appear here." />
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[880px] text-left text-sm">
             <thead>
               <tr className="border-b border-[var(--border)] text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
                 <th className="px-5 py-3">Time</th>

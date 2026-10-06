@@ -87,7 +87,7 @@ export default function KioskRegisterPage() {
 
   if (state.success && state.data) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center p-8 text-white">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center p-8 text-white">
         <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400">
           <CheckCircle className="h-8 w-8 text-white" />
         </div>
@@ -114,8 +114,8 @@ export default function KioskRegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-start overflow-y-auto p-4 py-8 text-white md:p-8">
-      <Link href="/kiosk" className="mb-6 flex items-center gap-2 text-white/70 hover:text-white self-start">
+    <div className="flex min-h-[100dvh] flex-col items-center justify-start overflow-y-auto p-4 py-8 text-white md:p-8">
+      <Link href="/kiosk/home" className="mb-6 flex items-center gap-2 text-white/70 hover:text-white self-start">
         <ArrowLeft className="h-5 w-5" />
         Back
       </Link>

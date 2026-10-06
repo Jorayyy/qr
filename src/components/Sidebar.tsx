@@ -38,7 +38,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
   const mayRegister = userRole ? can(userRole, "visitor:write") : false;
 
   return (
-    <aside className="no-print flex w-60 flex-col border-r border-[var(--border)] bg-white">
+    <aside className="no-print flex h-full w-60 flex-col border-r border-[var(--border)] bg-white">
       <div className="flex h-14 items-center gap-2 border-b border-[var(--border)] px-5">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-[var(--border)]">
           <img src="/logo.png" alt="EVSU Logo" className="h-full w-full object-contain" />

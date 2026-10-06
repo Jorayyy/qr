@@ -1,64 +1,40 @@
-"use client";
-
-import { UserPlus, ScanLine, DoorOpen } from "lucide-react";
 import Link from "next/link";
 
-export default function KioskPage() {
+/**
+ * Attract / splash screen. Pure static markup (no client component) so it is
+ * the very first thing a phone or kiosk terminal paints. The whole screen is
+ * the target, so there is no precision tap needed.
+ */
+export default function KioskSplashPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-8 text-white">
-      <div className="mb-8 flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl">
-        <img src="/logo.png" alt="EVSU Logo" className="h-full w-full object-contain p-1" />
-      </div>
+    <main className="flex min-h-[100dvh] flex-col items-center justify-center p-8 text-center text-white">
+      <Link
+        href="/kiosk/home"
+        aria-label="Touch screen to begin"
+        className="group flex w-full max-w-lg flex-col items-center gap-10 rounded-3xl p-6 outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+      >
+        <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl transition group-hover:scale-105 group-hover:bg-white/15">
+          <img src="/logo.png" alt="EVSU Logo" className="h-full w-full object-contain p-2" />
+        </div>
 
-      <h1 className="mb-2 text-4xl font-bold drop-shadow-lg">Visitor Management</h1>
-      <p className="mb-12 text-lg text-white/70 drop-shadow">Welcome to the university. Please register below.</p>
+        <div>
+          <h1 className="text-3xl font-bold drop-shadow-lg sm:text-4xl">
+            Visitor Management
+          </h1>
+          <p className="mt-3 text-white/70 drop-shadow">
+            Eastern Visayas State University
+          </p>
+        </div>
 
-      <div className="grid w-full max-w-md gap-4">
-        <Link
-          href="/kiosk/register"
-          className="group flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-6 text-white shadow-2xl backdrop-blur-xl transition hover:scale-105 hover:bg-white/20 hover:shadow-white/10"
-        >
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/15 shadow-lg transition group-hover:bg-white/25">
-            <UserPlus className="h-7 w-7" />
-          </div>
-          <div>
-            <p className="text-lg font-bold">Register as Visitor</p>
-            <p className="text-sm text-white/60">First-time or returning visitors</p>
-          </div>
-        </Link>
+        <span className="animate-pulse rounded-full border border-white/25 bg-white/10 px-8 py-4 text-lg font-bold shadow-xl backdrop-blur-xl transition group-hover:scale-105 group-hover:bg-white/20 group-hover:animate-none">
+          Touch screen to begin
+        </span>
 
-        <Link
-          href="/kiosk/scan"
-          className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 text-white backdrop-blur-xl transition hover:bg-white/15"
-        >
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/10 transition group-hover:bg-white/20">
-            <ScanLine className="h-7 w-7" />
-          </div>
-          <div>
-            <p className="text-lg font-bold">Already have a QR code?</p>
-            <p className="text-sm text-white/50">Show it at the guard station</p>
-          </div>
-        </Link>
-
-        <Link
-          href="/kiosk/exit"
-          className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 text-white backdrop-blur-xl transition hover:bg-white/15"
-        >
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/10 transition group-hover:bg-white/20">
-            <DoorOpen className="h-7 w-7" />
-          </div>
-          <div>
-            <p className="text-lg font-bold">Leaving the campus?</p>
-            <p className="text-sm text-white/50">Scan here to check out</p>
-          </div>
-        </Link>
-      </div>
-
-      <p className="mt-12 text-xs text-white/50">Touch screen to begin</p>
-
-      <a href="/login" className="fixed bottom-4 right-4 rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white/40 backdrop-blur transition hover:bg-white/20 hover:text-white/70">
-        Staff Login
-      </a>
-    </div>
+        <p className="max-w-sm text-xs leading-relaxed text-white/45">
+          University QR Code-Based Visitor Management — registration, check-in
+          and check-out.
+        </p>
+      </Link>
+    </main>
   );
 }

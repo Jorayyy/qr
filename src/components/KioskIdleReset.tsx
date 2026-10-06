@@ -19,7 +19,13 @@ export function KioskIdleReset({ idleMs = 60_000 }: { idleMs?: number }) {
     const schedule = () => {
       clearTimeout(timer);
       timer = setTimeout(() => {
-        router.replace("/kiosk");
+        // Unattended stations (department entrances, exit gate) must come back
+        // to *themselves* — sending them to /kiosk would drop the station's
+        // department binding. The `reset` query remounts the page so no
+        // previous visitor's details are left on screen.
+        const isStation =
+          pathname === "/kiosk/exit" || pathname.startsWith("/kiosk/departments/");
+        router.replace(isStation ? `${pathname}?reset=${Date.now()}` : "/kiosk");
       }, idleMs);
     };
 

@@ -25,6 +25,18 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+/* iOS zooms the viewport when a field below 16 px gains focus — keep form
+   controls at 16 px on phones (desktop keeps the tighter 14 px rhythm). */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 .field {

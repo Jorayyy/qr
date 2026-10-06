@@ -2,7 +2,7 @@ import { KioskIdleReset } from "@/components/KioskIdleReset";
 
 export default function KioskLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-[100dvh] overflow-hidden">
       <KioskIdleReset />
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useTransition, useEffect, useRef, useCallback } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { Card, CardHeader, Input, Button, Badge, Select } from "@/components/ui";
 import { checkInAction, checkOutAction, addVisitStopAction, checkOutStopAction } from "@/lib/actions/visitors";
 import { QrCode, Search, CheckCircle, XCircle, LogIn, LogOut, Camera, X, Keyboard, MapPin, Plus } from "lucide-react";
-import type { Html5Qrcode } from "html5-qrcode";
+import { CameraViewport, type CameraState } from "@/components/camera-viewport";
 
 type VisitStopInfo = {
   id: string;
@@ -51,26 +51,14 @@ export default function ScannerPage() {
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
   const [isPending, startTransition] = useTransition();
-  const [cameraActive, setCameraActive] = useState(false);
-  const [scanning, setScanning] = useState(false);
+  const [cameraOn, setCameraOn] = useState(true);
+  const [cameraState, setCameraState] = useState<CameraState>("idle");
   const [departments, setDepartments] = useState<Array<{ id: string; name: string; building: string | null }>>([]);
   const [stopDept, setStopDept] = useState("");
   const [stopBuilding, setStopBuilding] = useState("");
-  const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
-
-  const stopCamera = useCallback(() => {
-    if (html5QrCodeRef.current) {
-      try {
-        Promise.resolve(html5QrCodeRef.current.stop()).catch(() => {});
-        Promise.resolve(html5QrCodeRef.current.clear()).catch(() => {});
-      } catch {}
-      html5QrCodeRef.current = null;
-    }
-    setCameraActive(false);
-    setScanning(false);
-  }, []);
 
   const lookupVisit = useCallback(async (qrCode: string) => {
+    setCameraOn(false);
     setError("");
     setResult(null);
     setFeedback("");
@@ -82,66 +70,11 @@ export default function ScannerPage() {
       }
       const data = await res.json();
       setResult(data);
-      stopCamera();
       fetch("/api/departments").then((r) => r.json()).then(setDepartments);
     } catch {
       setError("Failed to look up QR code.");
     }
-  }, [stopCamera]);
-
-  const startCamera = useCallback(async () => {
-    setMode("camera");
-    setError("");
-    setResult(null);
-    setFeedback("");
-
-    try {
-      const { Html5Qrcode } = await import("html5-qrcode");
-
-      if (html5QrCodeRef.current) {
-        try {
-          Promise.resolve(html5QrCodeRef.current.stop()).catch(() => {});
-          Promise.resolve(html5QrCodeRef.current.clear()).catch(() => {});
-        } catch {}
-      }
-
-      const scanner = new Html5Qrcode("qr-reader");
-      html5QrCodeRef.current = scanner;
-      setCameraActive(true);
-      setScanning(true);
-
-      await scanner.start(
-        { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0,
-        },
-        (decodedText: string) => {
-          lookupVisit(decodedText);
-          stopCamera();
-        },
-        () => {}
-      );
-    } catch (err) {
-      console.error("Camera error:", err instanceof Error ? err.message : String(err));
-      setError("Could not access camera. Use manual entry instead.");
-      setCameraActive(false);
-      setScanning(false);
-    }
-  }, [lookupVisit, stopCamera]);
-
-  useEffect(() => {
-    if (mode === "camera" && !result) {
-      // Camera startup is an external-system interaction; the effect subscribes
-      // the scanner to the viewport when the mode changes.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      startCamera();
-    }
-    return () => {
-      stopCamera();
-    };
-  }, [mode]);
+  }, []);
 
   async function handleManualLookup(e: React.FormEvent) {
     e.preventDefault();
@@ -221,42 +154,62 @@ export default function ScannerPage() {
       <div className="flex gap-2">
         <Button
           variant={mode === "camera" ? "primary" : "secondary"}
-          onClick={() => { setMode("camera"); startCamera(); }}
+          onClick={() => {
+            setMode("camera");
+            setError("");
+            setResult(null);
+            setFeedback("");
+            setCameraOn(true);
+          }}
         >
           <Camera className="h-4 w-4" />
           Camera Scan
         </Button>
         <Button
           variant={mode === "manual" ? "primary" : "secondary"}
-          onClick={() => { stopCamera(); setMode("manual"); }}
+          onClick={() => {
+            setMode("manual");
+            setCameraOn(false);
+          }}
         >
           <Keyboard className="h-4 w-4" />
           Manual Entry
         </Button>
       </div>
 
-      {mode === "camera" && (
+      {mode === "camera" && !result && (
         <Card>
           <CardHeader
             title="Camera Scanner"
-            subtitle={scanning ? "Point camera at a QR code" : "Starting camera..."}
-            action={cameraActive ? (
-              <Button variant="ghost" onClick={stopCamera}>
-                <X className="h-4 w-4" />
-              </Button>
-            ) : undefined}
+            subtitle={
+              cameraState === "ready"
+                ? "Point camera at a QR code"
+                : cameraState === "error"
+                  ? "Camera unavailable — try again or use manual entry"
+                  : cameraState === "idle"
+                    ? "Camera is off"
+                    : "Starting camera…"
+            }
+            action={
+              cameraOn ? (
+                <Button variant="ghost" onClick={() => setCameraOn(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              ) : undefined
+            }
           />
           <div className="p-5">
-            <div id="qr-reader" className="w-full overflow-hidden rounded-lg" />
-            {!cameraActive && !result && (
-              <div className="flex flex-col items-center py-8 text-center">
-                <Camera className="h-12 w-12 text-slate-300 mb-3" />
-                <p className="text-sm text-[var(--muted)]">Camera not available</p>
-                <Button onClick={startCamera} className="mt-3">
-                  <Camera className="h-4 w-4" />
-                  Try Again
-                </Button>
-              </div>
+            <CameraViewport
+              active={cameraOn}
+              onScan={(text) => lookupVisit(text)}
+              onStateChange={setCameraState}
+              className="rounded-lg"
+            />
+            {!cameraOn && (
+              <Button onClick={() => setCameraOn(true)} className="mt-3 w-full">
+                <Camera className="h-4 w-4" />
+                Start Camera
+              </Button>
             )}
           </div>
         </Card>
@@ -408,7 +361,7 @@ export default function ScannerPage() {
             <Button
               variant="ghost"
               className="w-full"
-              onClick={() => { setResult(null); setFeedback(""); setError(""); startCamera(); }}
+              onClick={() => { setResult(null); setFeedback(""); setError(""); setMode("camera"); setCameraOn(true); }}
             >
               Scan Another
             </Button>

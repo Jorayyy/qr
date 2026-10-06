@@ -4,10 +4,13 @@ import { KioskStation } from "@/components/kiosk-station";
 
 export default async function DepartmentStationPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ reset?: string }>;
 }) {
   const { id } = await params;
+  const { reset } = await searchParams;
 
   const department = await db.department.findUnique({
     where: { id },
@@ -17,6 +20,7 @@ export default async function DepartmentStationPage({
 
   return (
     <KioskStation
+      key={reset ?? department.id}
       title={department.name}
       subtitle={`Entrance station${department.building ? ` · ${department.building}` : ""} — scan your QR code to check in here.`}
       action="checkin"
