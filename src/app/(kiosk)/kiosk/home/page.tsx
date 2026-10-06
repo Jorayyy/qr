@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, UserPlus, ScanLine, DoorOpen } from "lucide-react";
+import { logoutAction } from "@/lib/actions/auth";
 
 export default function KioskHomePage() {
   return (
@@ -61,12 +62,14 @@ export default function KioskHomePage() {
         </Link>
       </div>
 
-      <a
-        href="/login"
-        className="fixed bottom-4 right-4 rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white/40 backdrop-blur transition hover:bg-white/20 hover:text-white/70"
-      >
-        Staff Login
-      </a>
+      <form action={logoutAction} className="fixed bottom-4 right-4">
+        <button
+          type="submit"
+          className="rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white/40 backdrop-blur transition hover:bg-white/20 hover:text-white/70"
+        >
+          Staff Login
+        </button>
+      </form>
     </div>
   );
 }
