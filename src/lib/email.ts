@@ -1,18 +1,46 @@
 import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import QRCode from "qrcode";
+
+type SmtpConfig = {
+  host: string;
+  port: number;
+  user: string;
+  pass: string;
+};
 
 /**
  * Read at call time (not module scope) so the flag follows runtime env vars
  * even when the bundler inlined an unset value at build time.
  */
+function smtpConfig(): SmtpConfig | null {
+  const user = process.env.SMTP_USER?.trim();
+  const pass = process.env.SMTP_PASS?.trim();
+  if (!user || !pass) return null;
+
+  const port = Number(process.env.SMTP_PORT?.trim()) || 465;
+  return {
+    host: process.env.SMTP_HOST?.trim() || "smtp.gmail.com",
+    port,
+    user,
+    pass,
+  };
+}
+
 export function emailEnabled(): boolean {
-  return Boolean(process.env.RESEND_API_KEY);
+  return Boolean(smtpConfig() || process.env.RESEND_API_KEY);
 }
 
 function fromAddress(): string {
-  return (
-    process.env.EMAIL_FROM?.trim() || "Visitor Management <onboarding@resend.dev>"
-  );
+  const explicit = process.env.EMAIL_FROM?.trim();
+  if (explicit) return explicit;
+
+  const smtp = smtpConfig();
+  // Gmail only accepts From addresses that match the authenticated mailbox,
+  // but it does allow a friendly name in front of it.
+  if (smtp) return `Visitor Management <${smtp.user}>`;
+
+  return "Visitor Management <onboarding@resend.dev>";
 }
 
 export type QrEmailInput = {
@@ -72,12 +100,31 @@ function buildHtml(input: QrEmailInput): string {
 </div>`.trim();
 }
 
+function logFailure(input: QrEmailInput, transport: string, reason: string): void {
+  console.error(
+    JSON.stringify({
+      level: "error",
+      event: "QR_EMAIL_FAILED",
+      transport,
+      to: input.to,
+      error: reason,
+    })
+  );
+}
+
 /**
- * Emails the visitor their QR code. Returns false (never throws) when the
- * provider is unconfigured or the send fails, so registration can proceed.
+ * Emails the visitor their QR code. Returns false (never throws) when no
+ * transport is configured or the send fails, so registration can proceed.
+ *
+ * Transport order: SMTP (dedicated mailbox) when SMTP_USER/SMTP_PASS are set,
+ * otherwise the Resend API when RESEND_API_KEY is set.
  */
 export async function sendQrEmail(input: QrEmailInput): Promise<boolean> {
-  if (!input.to || !process.env.RESEND_API_KEY) return false;
+  if (!input.to) return false;
+
+  const smtp = smtpConfig();
+  const useResend = !smtp && Boolean(process.env.RESEND_API_KEY);
+  if (!smtp && !useResend) return false;
 
   try {
     const png = await QRCode.toBuffer(input.qrCode, {
@@ -86,11 +133,41 @@ export async function sendQrEmail(input: QrEmailInput): Promise<boolean> {
       color: { dark: "#1e293b", light: "#ffffff" },
     });
 
+    const subject = `Your visitor QR code — ${input.qrCode}`;
+
+    if (smtp) {
+      const transport = nodemailer.createTransport({
+        host: smtp.host,
+        port: smtp.port,
+        secure: smtp.port === 465,
+        auth: { user: smtp.user, pass: smtp.pass },
+        connectionTimeout: 10_000,
+        greetingTimeout: 10_000,
+        socketTimeout: 20_000,
+      });
+
+      await transport.sendMail({
+        from: fromAddress(),
+        to: input.to,
+        subject,
+        html: buildHtml(input),
+        attachments: [
+          {
+            filename: `qr-${input.qrCode}.png`,
+            content: png,
+            contentType: "image/png",
+            cid: "qrcode",
+          },
+        ],
+      });
+      return true;
+    }
+
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { error } = await resend.emails.send({
       from: fromAddress(),
       to: input.to,
-      subject: `Your visitor QR code — ${input.qrCode}`,
+      subject,
       html: buildHtml(input),
       attachments: [
         {
@@ -103,25 +180,15 @@ export async function sendQrEmail(input: QrEmailInput): Promise<boolean> {
     });
 
     if (error) {
-      console.error(
-        JSON.stringify({
-          level: "error",
-          event: "QR_EMAIL_FAILED",
-          to: input.to,
-          error: error.message,
-        })
-      );
+      logFailure(input, "resend", error.message);
       return false;
     }
     return true;
   } catch (error) {
-    console.error(
-      JSON.stringify({
-        level: "error",
-        event: "QR_EMAIL_FAILED",
-        to: input.to,
-        error: error instanceof Error ? error.message : String(error),
-      })
+    logFailure(
+      input,
+      smtp ? "smtp" : "resend",
+      error instanceof Error ? error.message : String(error)
     );
     return false;
   }
