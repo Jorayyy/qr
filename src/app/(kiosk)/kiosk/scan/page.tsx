@@ -28,6 +28,7 @@ function formatDate(d?: Date | string | null) {
 export default function KioskScanPage() {
   const [mode, setMode] = useState<"camera" | "manual">("camera");
   const [qrInput, setQrInput] = useState("");
+  const [scannedQr, setScannedQr] = useState("");
   const [result, setResult] = useState<KioskVisitResult | null>(null);
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -60,6 +61,7 @@ export default function KioskScanPage() {
       }
       const data = await res.json();
       setResult(data);
+      setScannedQr(qrCode.trim());
       stopCamera();
     } catch {
       setError("Failed to look up QR code.");
@@ -108,11 +110,17 @@ export default function KioskScanPage() {
       const res = await fetch("/api/visits/checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visitId: result.id }),
+        // The QR itself is the credential — anonymous kiosk users cannot
+        // address a visit by id (IDOR protection).
+        body: JSON.stringify({ qr: scannedQr }),
       });
       const data = await res.json();
       if (data.success) {
-        setFeedback("Checked in successfully! Welcome to the university.");
+        setFeedback(
+          typeof data.message === "string" && data.message
+            ? data.message
+            : "Checked in successfully! Welcome to the university."
+        );
         setResult({ ...result, status: "CHECKED_IN", actualArrival: new Date().toISOString() });
       } else {
         setFeedback(data.message || "Failed to check in.");

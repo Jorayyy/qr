@@ -5,22 +5,22 @@ import { getSession } from "@/lib/auth";
 import { recordAudit } from "@/lib/audit";
 import { LIMITS, WINDOWS, rateLimit } from "@/lib/rate-limit";
 import { isSameOrigin, jsonError, jsonOk, rateLimitResponse, withApiHandler } from "@/lib/http";
-import { checkinSchema } from "@/lib/validation";
+import { checkoutSchema } from "@/lib/validation";
 import { can } from "@/lib/rbac";
 
-const GENERIC_INVALID = "This QR code is not valid for check-in.";
+const GENERIC_INVALID = "This QR code is not valid for check-out.";
 
 /**
- * Check-in endpoint.
+ * Exit scan endpoint — the mirror of /api/visits/checkin.
  *
- * Authorization model:
- * - Anonymous (kiosk): may check in by presenting the QR credential itself.
- * - Authenticated staff: may check in by visit id (scanner UI) or QR.
+ * Used by the guard post / kiosk exit station so a visitor leaving the
+ * premises is a single scan. Authorization model matches check-in:
+ * - Anonymous (kiosk): may check out by presenting the QR credential itself.
+ * - Authenticated staff: may check out by visit id (scanner UI) or QR.
  * - visitId without a session is rejected (IDOR fix).
  *
- * Status transitions are enforced server-side (PENDING → CHECKED_IN only).
- * Passing `departmentId` binds the scan to a department entrance station: it
- * additionally records a VisitStop so the admin side shows the arrival.
+ * Status transitions are enforced server-side (CHECKED_IN → CHECKED_OUT only);
+ * every open VisitStop is closed at the same timestamp.
  */
 export async function POST(req: NextRequest) {
   return withApiHandler(req, async ({ requestId, ip }) => {
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       return jsonError(400, "Invalid JSON body.", requestId);
     }
 
-    const parsed = checkinSchema.safeParse(body);
+    const parsed = checkoutSchema.safeParse(body);
     if (!parsed.success) {
       return jsonError(400, parsed.error.issues[0]?.message ?? "Invalid request.", requestId);
     }
@@ -43,9 +43,9 @@ export async function POST(req: NextRequest) {
     const user = await getSession();
     const staffAllowed = Boolean(user && can(user.role, "visit:transition"));
 
-    const ipLimit = await rateLimit(`checkin:ip:${ip ?? "unknown"}`, LIMITS.checkinPerIp(), WINDOWS.short);
+    const ipLimit = await rateLimit(`checkout:ip:${ip ?? "unknown"}`, LIMITS.checkinPerIp(), WINDOWS.short);
     const userLimit = user
-      ? await rateLimit(`checkin:user:${user.userId}`, LIMITS.checkinPerUser(), WINDOWS.short)
+      ? await rateLimit(`checkout:user:${user.userId}`, LIMITS.checkinPerUser(), WINDOWS.short)
       : { ok: true as const, remaining: 0 };
     if (!ipLimit.ok || !userLimit.ok) {
       const retry =
@@ -56,13 +56,12 @@ export async function POST(req: NextRequest) {
     let visit: {
       id: string;
       status: "PENDING" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELLED";
-      qrExpiresAt: Date | null;
       qrRevokedAt: Date | null;
       visitor: { firstName: string };
     } | null = null;
 
     if (parsed.data.qr) {
-      const qrLimit = await rateLimit(`checkin:qr:${parsed.data.qr}`, LIMITS.lookupPerQr(), WINDOWS.short);
+      const qrLimit = await rateLimit(`checkout:qr:${parsed.data.qr}`, LIMITS.lookupPerQr(), WINDOWS.short);
       if (!qrLimit.ok) return rateLimitResponse(qrLimit.retryAfterSeconds, requestId);
 
       visit = await db.visit.findUnique({
@@ -70,7 +69,6 @@ export async function POST(req: NextRequest) {
         select: {
           id: true,
           status: true,
-          qrExpiresAt: true,
           qrRevokedAt: true,
           visitor: { select: { firstName: true } },
         },
@@ -79,7 +77,7 @@ export async function POST(req: NextRequest) {
         await recordAudit({
           actorId: user?.userId,
           actorEmail: user?.email,
-          action: "QR_CHECKIN",
+          action: "QR_CHECKOUT",
           result: "FAILURE",
           targetType: "qr",
           ip,
@@ -94,7 +92,7 @@ export async function POST(req: NextRequest) {
         await recordAudit({
           actorId: user?.userId,
           actorEmail: user?.email,
-          action: "QR_CHECKIN",
+          action: "QR_CHECKOUT",
           result: "DENIED",
           targetType: "visit",
           targetId: parsed.data.visitId,
@@ -110,7 +108,6 @@ export async function POST(req: NextRequest) {
         select: {
           id: true,
           status: true,
-          qrExpiresAt: true,
           qrRevokedAt: true,
           visitor: { select: { firstName: true } },
         },
@@ -122,44 +119,28 @@ export async function POST(req: NextRequest) {
 
     if (!visit) return jsonError(400, "qr or visitId is required.", requestId);
 
-    const now = Date.now();
-    const expired = Boolean(visit.qrExpiresAt && visit.qrExpiresAt.getTime() < now);
-    const revoked = Boolean(visit.qrRevokedAt);
-    if (expired || revoked) {
+    // Revocation blocks everything. QR *expiry* does not block exit: a visitor
+    // already admitted must still be able to leave through the exit scan.
+    if (visit.qrRevokedAt) {
       await recordAudit({
         actorId: user?.userId,
         actorEmail: user?.email,
-        action: "QR_CHECKIN",
+        action: "QR_CHECKOUT",
         result: "DENIED",
         targetType: "visit",
         targetId: visit.id,
         ip,
         requestId,
-        meta: { reason: expired ? "expired" : "revoked", channel: user ? "staff" : "kiosk" },
+        meta: { reason: "revoked", channel: user ? "staff" : "kiosk" },
       });
       return jsonError(403, "This QR code is no longer valid.", requestId);
     }
 
-    // Department entrance station: when a station is bound to a department the
-    // scan also logs an arrival *stop* for that department so the admin side
-    // shows where the visitor physically went.
-    let stopDepartment: { id: string; name: string } | null = null;
-    if (parsed.data.departmentId) {
-      const department = await db.department.findUnique({
-        where: { id: parsed.data.departmentId },
-        select: { id: true, name: true, isActive: true },
-      });
-      if (!department || !department.isActive) {
-        return jsonError(400, "This department station is unavailable.", requestId);
-      }
-      stopDepartment = { id: department.id, name: department.name };
-    }
-
-    if (visit.status !== "PENDING" && !(visit.status === "CHECKED_IN" && stopDepartment)) {
+    if (visit.status !== "CHECKED_IN") {
       await recordAudit({
         actorId: user?.userId,
         actorEmail: user?.email,
-        action: "QR_CHECKIN",
+        action: "QR_CHECKOUT",
         result: "FAILURE",
         targetType: "visit",
         targetId: visit.id,
@@ -169,78 +150,50 @@ export async function POST(req: NextRequest) {
       });
       return jsonError(
         409,
-        `Visit is already ${visit.status.toLowerCase().replace("_", " ")}.`,
+        visit.status === "PENDING"
+          ? "Visitor has not checked in yet."
+          : `Visit is already ${visit.status.toLowerCase().replace("_", " ")}.`,
         requestId
       );
     }
 
-    const at = new Date();
-    let stopId: string | null = null;
-
-    if (stopDepartment && visit.status === "CHECKED_IN") {
-      // Already inside the premises — this scan only records the new stop.
-      const openStop = await db.visitStop.findFirst({
-        where: { visitId: visit.id, departmentId: stopDepartment.id, checkedOutAt: null },
-        select: { id: true },
-      });
-      if (openStop) {
-        return jsonError(409, "You are already logged in at this department.", requestId);
-      }
-      const stop = await db.visitStop.create({
-        data: { visitId: visit.id, departmentId: stopDepartment.id, checkedInAt: at },
-        select: { id: true },
-      });
-      stopId = stop.id;
-    } else {
-      await db.visit.update({
-        where: { id: visit.id },
-        data: {
-          status: "CHECKED_IN",
-          actualArrival: at,
-          ...(user ? { checkedInById: user.userId } : {}),
-        },
-      });
-      if (stopDepartment) {
-        const stop = await db.visitStop.create({
-          data: { visitId: visit.id, departmentId: stopDepartment.id, checkedInAt: at },
-          select: { id: true },
-        });
-        stopId = stop.id;
-      }
-    }
+    const departure = new Date();
+    await db.visit.update({
+      where: { id: visit.id },
+      data: {
+        status: "CHECKED_OUT",
+        actualDeparture: departure,
+        ...(user ? { checkedOutById: user.userId } : {}),
+      },
+    });
+    await db.visitStop.updateMany({
+      where: { visitId: visit.id, checkedOutAt: null },
+      data: { checkedOutAt: departure },
+    });
 
     await recordAudit({
       actorId: user?.userId,
       actorEmail: user?.email,
-      action: "QR_CHECKIN",
+      action: "QR_CHECKOUT",
       result: "SUCCESS",
       targetType: "visit",
       targetId: visit.id,
       ip,
       requestId,
-      meta: {
-        channel: user ? "staff" : "kiosk",
-        ...(stopDepartment
-          ? { departmentId: stopDepartment.id, department: stopDepartment.name, stopId }
-          : {}),
-      },
+      meta: { channel: user ? "staff" : "kiosk" },
     });
 
     revalidatePath("/dashboard");
     revalidatePath("/visitors");
     revalidatePath("/visitors/[id]", "page");
 
-    // Minimal payload: first name + status only (no email/phone/ID/notes).
     return jsonOk({
       success: true,
-      message: stopDepartment
-        ? `Checked in at ${stopDepartment.name}.`
-        : "Checked in successfully.",
-      stopAdded: Boolean(stopId),
+      message: "Checked out. Thank you for visiting.",
       visit: {
         id: visit.id,
-        status: "CHECKED_IN",
-        actualArrival: at,
+        status: "CHECKED_OUT",
+        actualDeparture: departure,
         visitor: { firstName: visit.visitor.firstName },
       },
     });

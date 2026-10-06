@@ -1,6 +1,6 @@
 "use client";
 
-import { UserPlus, ScanLine } from "lucide-react";
+import { UserPlus, ScanLine, DoorOpen } from "lucide-react";
 import Link from "next/link";
 
 export default function KioskPage() {
@@ -37,6 +37,19 @@ export default function KioskPage() {
           <div>
             <p className="text-lg font-bold">Already have a QR code?</p>
             <p className="text-sm text-white/50">Show it at the guard station</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/kiosk/exit"
+          className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 text-white backdrop-blur-xl transition hover:bg-white/15"
+        >
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/10 transition group-hover:bg-white/20">
+            <DoorOpen className="h-7 w-7" />
+          </div>
+          <div>
+            <p className="text-lg font-bold">Leaving the campus?</p>
+            <p className="text-sm text-white/50">Scan here to check out</p>
           </div>
         </Link>
       </div>

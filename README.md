@@ -82,9 +82,14 @@ See `.env.example` for every variable. The two required ones:
   Permissions-Policy (camera = self for the scanner) via `next.config.ts`.
 - **QR codes**: 128-bit random, optional expiry/revocation, single-use state
   machine for visit transitions.
-- **Kiosk**: public register/lookup/check-in endpoints are validated, rate
-  limited and audited; lookup returns a minimal projection (first name only);
-  the terminal auto-returns home after 60 s of inactivity.
+- **Kiosk**: public register/lookup/check-in/check-out endpoints are validated,
+  rate limited and audited; lookup returns a minimal projection (first name
+  only); the terminal auto-returns home after 60 s of inactivity.
+- **Scan stations**: `/kiosk/scan` (general check-in), `/kiosk/departments/[id]`
+  (per-department entrance — also records a `VisitStop` so the admin visit
+  history shows where the visitor went), `/kiosk/exit` (guard/gate check-out).
+  Every station sends the QR itself as the credential, so they work without a
+  staff session.
 
 ## Operations
 

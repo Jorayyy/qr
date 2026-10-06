@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   checkinSchema,
+  checkoutSchema,
   createUserSchema,
   loginSchema,
   qrLookupSchema,
@@ -86,6 +87,32 @@ describe("checkinSchema", () => {
     expect(
       checkinSchema.safeParse({ visitId: "00000000-0000-4000-8000-000000000000" }).success
     ).toBe(true);
+  });
+
+  it("accepts an optional department station id", () => {
+    expect(
+      checkinSchema.safeParse({
+        qr: "VMS-1-ab12cd34",
+        departmentId: "00000000-0000-4000-8000-000000000000",
+      }).success
+    ).toBe(true);
+    expect(checkinSchema.safeParse({ qr: "VMS-1-ab12cd34", departmentId: "not-a-uuid" }).success).toBe(
+      false
+    );
+  });
+});
+
+describe("checkoutSchema", () => {
+  it("requires a qr or visitId", () => {
+    expect(checkoutSchema.safeParse({}).success).toBe(false);
+    expect(checkoutSchema.safeParse({ qr: "VMS-1-ab12cd34" }).success).toBe(true);
+    expect(
+      checkoutSchema.safeParse({ visitId: "00000000-0000-4000-8000-000000000000" }).success
+    ).toBe(true);
+  });
+
+  it("rejects unknown fields", () => {
+    expect(checkoutSchema.safeParse({ qr: "VMS-1-ab12cd34", admin: true }).success).toBe(false);
   });
 });
 

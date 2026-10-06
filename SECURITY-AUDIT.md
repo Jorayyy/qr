@@ -46,7 +46,8 @@ three RCE advisories).
 | 23 | **Medium** | No forced password-change flow | Fixed: `/account/password` + layout redirect that holds `mustChangePassword` users until they comply; password change revokes all other sessions |
 | 24 | **Low** | No error/404 pages (framework defaults leak less, but inconsistent) | Fixed: custom `not-found.tsx` / `error.tsx`, no PII in output |
 | 25 | **Low** | No retention policy for security data | Fixed: `npm run purge` (`scripts/purge-retention.ts`) with `AUDIT_RETENTION_DAYS` / `SESSION_RETENTION_DAYS` |
-| 26 | **Low** | No tests / CI | Fixed: 53 vitest unit tests (validation, RBAC matrix, password, MFA, env, audit sanitization), GitHub Actions CI, Dependabot |
+| 26 | **Low** | No tests / CI | Fixed: 64 vitest unit tests (validation, RBAC matrix, password, MFA, env, audit sanitization, OCR parsing), GitHub Actions CI, Dependabot |
+| 27 | **Low** | No way for a visitor to leave without a staff member driving the transition | Fixed: public exit scan `/kiosk/exit` → `POST /api/visits/checkout` under the same model as check-in (QR possession or `visit:transition` session, same-origin check, rate limits, audit `QR_CHECKOUT`, closes open stops; expiry does not block exit, revocation does) |
 
 ### Bugs found and fixed during hardening
 
@@ -62,9 +63,9 @@ three RCE advisories).
 |-------|--------|
 | `npx prisma validate` | ✅ schema valid |
 | `npm run typecheck` | ✅ 0 errors |
-| `npm run lint` | ✅ 0 errors (6 warnings: `no-img-element` on local logos/QR images, 2 intentional camera-effect dep arrays) |
-| `npm test` | ✅ 53/53 passing |
-| `npm run build` | ✅ Next 16.3.8, all 20 routes + proxy |
+| `npm run lint` | ✅ 0 errors (7 warnings: `no-img-element` on local logos/QR images, 2 intentional camera-effect dep arrays) |
+| `npm test` | ✅ 64/64 passing |
+| `npm run build` | ✅ Next 16.3.8, all 22 routes + proxy |
 | `npm audit` | ✅ 0 vulnerabilities — Prisma-CLI-only highs (`deepmerge-ts`, `mysql2`) cleared with pinned `overrides` in `package.json`, verified against `prisma generate` / `validate` / `db push` / `migrate deploy` |
 
 ## 4. Production checklist

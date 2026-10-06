@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { Card, Badge, Button, PageHeader, EmptyState } from "@/components/ui";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, QrCode } from "lucide-react";
 import { requirePermission } from "@/lib/auth";
 import { ToggleForm, DeleteForm } from "./actions-client";
 
@@ -67,6 +67,18 @@ export default async function DepartmentsPage() {
                   <Pencil className="inline h-3 w-3 mr-1" />
                   Edit
                 </Link>
+                {d.isActive && (
+                  <Link
+                    href={`/kiosk/departments/${d.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="Open the entrance scan station for this department"
+                    className="text-xs font-medium text-[var(--brand)] hover:underline"
+                  >
+                    <QrCode className="inline h-3 w-3 mr-1" />
+                    Station
+                  </Link>
+                )}
                 <ToggleForm departmentId={d.id} isActive={d.isActive} />
                 <DeleteForm departmentId={d.id} visitCount={d._count.visits} stopCount={d._count.visitStops} />
               </div>

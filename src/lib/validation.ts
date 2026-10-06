@@ -89,6 +89,17 @@ export const checkinSchema = z
   .object({
     qr: qrLookupSchema.optional(),
     visitId: z.string().uuid().optional(),
+    departmentId: z.string().uuid().optional(),
+  })
+  .strict()
+  .refine((value) => Boolean(value.qr || value.visitId), {
+    message: "qr or visitId is required",
+  });
+
+export const checkoutSchema = z
+  .object({
+    qr: qrLookupSchema.optional(),
+    visitId: z.string().uuid().optional(),
   })
   .strict()
   .refine((value) => Boolean(value.qr || value.visitId), {
