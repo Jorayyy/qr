@@ -3,6 +3,8 @@
 import { useActionState, useRef, useEffect, useState } from "react";
 import { Card, CardHeader, Input, Select, Button } from "@/components/ui";
 import { registerVisitorAction, type ActionState } from "@/lib/actions/visitors";
+import { IdOcrScanButton, applyOcrToForm } from "@/components/id-ocr";
+import type { OcrFields } from "@/lib/ocr";
 import { ArrowLeft, CheckCircle, Download, Printer } from "lucide-react";
 import Link from "next/link";
 import QRCode from "qrcode";
@@ -110,6 +112,11 @@ export default function RegisterVisitorPage() {
     { success: false, message: "" }
   );
   const [departments, setDepartments] = useState<Array<{ id: string; name: string; building: string | null }>>([]);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleOcr = (fields: OcrFields) => {
+    applyOcrToForm(formRef.current, fields);
+  };
 
   useEffect(() => {
     fetch("/api/departments").then((r) => r.json()).then(setDepartments);
@@ -128,6 +135,19 @@ export default function RegisterVisitorPage() {
           <p className="mt-1 text-sm text-[var(--muted)]">
             Show or send this QR code to the visitor. They can use it at any check-in station.
           </p>
+          {state.data.emailTo && (
+            <p
+              className={
+                state.data.emailSent
+                  ? "mt-2 text-sm font-medium text-emerald-600"
+                  : "mt-2 text-sm font-medium text-amber-600"
+              }
+            >
+              {state.data.emailSent
+                ? `QR code emailed to ${state.data.emailTo}.`
+                : `Could not email ${state.data.emailTo} — show or download the QR below.`}
+            </p>
+          )}
 
           <div className="mt-6">
             <QRCodeDisplay
@@ -163,10 +183,12 @@ export default function RegisterVisitorPage() {
       <Card>
         <CardHeader title="Register Visitor" subtitle="Fill in details to generate a scannable QR code" />
 
-        <form action={formAction} className="space-y-6 p-5">
+        <form ref={formRef} action={formAction} className="space-y-6 p-5">
           {state.message && !state.success && (
             <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{state.message}</div>
           )}
+
+          <IdOcrScanButton onExtract={handleOcr} />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>

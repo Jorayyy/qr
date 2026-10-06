@@ -6,7 +6,7 @@
 export const PERMISSIONS = {
   "visit:read": ["ADMIN", "STAFF", "SECURITY", "RECEPTIONIST"],
   "visitor:read": ["ADMIN", "STAFF", "SECURITY", "RECEPTIONIST"],
-  "visitor:write": ["ADMIN", "STAFF", "RECEPTIONIST"],
+  "visitor:write": ["ADMIN", "STAFF", "RECEPTIONIST", "SECURITY"],
   "visitor:delete": ["ADMIN"],
   "visit:transition": ["ADMIN", "STAFF", "SECURITY", "RECEPTIONIST"],
   "visit:revoke-qr": ["ADMIN", "SECURITY"],

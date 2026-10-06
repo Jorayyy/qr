@@ -2,6 +2,8 @@
 
 import { useActionState, useState, useEffect, useRef } from "react";
 import { registerVisitorAction, type ActionState } from "@/lib/actions/visitors";
+import { IdOcrScanButton, applyOcrToForm } from "@/components/id-ocr";
+import type { OcrFields } from "@/lib/ocr";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import QRCode from "qrcode";
@@ -73,6 +75,11 @@ export default function KioskRegisterPage() {
     { success: false, message: "" }
   );
   const [departments, setDepartments] = useState<Array<{ id: string; name: string; building: string | null }>>([]);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleOcr = (fields: OcrFields) => {
+    applyOcrToForm(formRef.current, fields);
+  };
 
   useEffect(() => {
     fetch("/api/departments").then((r) => r.json()).then(setDepartments);
@@ -86,6 +93,13 @@ export default function KioskRegisterPage() {
         </div>
         <h1 className="mb-2 text-3xl font-bold">You&apos;re Registered!</h1>
         <p className="mb-8 text-white/70">Show this QR code at each building entrance.</p>
+        {state.data.emailTo && (
+          <p className="mb-4 text-sm font-medium text-emerald-300">
+            {state.data.emailSent
+              ? `A copy was emailed to ${state.data.emailTo}.`
+              : `We could not email ${state.data.emailTo} — please save the QR code below.`}
+          </p>
+        )}
 
         <QRCodeDisplay qrString={state.data.qrCode} />
 
@@ -110,10 +124,12 @@ export default function KioskRegisterPage() {
         <h1 className="mb-2 text-3xl font-bold">Visitor Registration</h1>
         <p className="mb-6 text-white/70">Fill in your details to get a QR access pass.</p>
 
-        <form action={formAction} className="space-y-5">
+        <form ref={formRef} action={formAction} className="space-y-5">
           {state.message && !state.success && (
             <div className="rounded-xl bg-red-500/20 p-4 text-sm text-red-100 backdrop-blur">{state.message}</div>
           )}
+
+          <IdOcrScanButton onExtract={handleOcr} tone="dark" />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>

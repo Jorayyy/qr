@@ -10,9 +10,11 @@ import {
   Building2,
   ShieldCheck,
   KeyRound,
+  UserPlus,
 } from "lucide-react";
 import { cx, buttonClass } from "@/components/ui";
 import { logoutAction } from "@/lib/actions/auth";
+import { can } from "@/lib/rbac";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -33,6 +35,7 @@ type SidebarProps = {
 export function Sidebar({ userName, userRole }: SidebarProps) {
   const pathname = usePathname();
   const isAdmin = userRole === "ADMIN";
+  const mayRegister = userRole ? can(userRole, "visitor:write") : false;
 
   return (
     <aside className="no-print flex w-60 flex-col border-r border-[var(--border)] bg-white">
@@ -63,6 +66,21 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
             </Link>
           );
         })}
+
+        {mayRegister && (
+          <Link
+            href="/visitors/register"
+            className={cx(
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+              pathname.startsWith("/visitors/register")
+                ? "bg-blue-50 text-[var(--brand)]"
+                : "text-slate-600 hover:bg-blue-50 hover:text-[var(--brand)]"
+            )}
+          >
+            <UserPlus className="h-4 w-4" />
+            Register Walk-in
+          </Link>
+        )}
 
         {isAdmin && (
           <>

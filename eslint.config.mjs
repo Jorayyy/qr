@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Generated Prisma client:
     "src/generated/**",
+    // Self-hosted OCR engine bundles (minified vendor assets):
+    "public/**",
   ]),
 ]);
 

@@ -10,11 +10,11 @@ describe("permission matrix", () => {
     }
   });
 
-  it("SECURITY can transition visits and read audit, but not write visitors", () => {
+  it("SECURITY can transition visits, read audit, and register walk-ins", () => {
     expect(can("SECURITY", "visit:transition")).toBe(true);
     expect(can("SECURITY", "audit:read")).toBe(true);
     expect(can("SECURITY", "visit:revoke-qr")).toBe(true);
-    expect(can("SECURITY", "visitor:write")).toBe(false);
+    expect(can("SECURITY", "visitor:write")).toBe(true);
     expect(can("SECURITY", "visitor:delete")).toBe(false);
     expect(can("SECURITY", "department:manage")).toBe(false);
     expect(can("SECURITY", "users:manage")).toBe(false);

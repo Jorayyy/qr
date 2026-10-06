@@ -109,6 +109,6 @@ three RCE advisories).
 2. **CSP uses `'unsafe-inline'` for scripts**: required by Next.js inline bootstrap scripts without per-request nonce support in `headers()`; React escaping + no `dangerouslySetInnerHTML` + upgrade-insecure-requests keep the practical risk low. A per-request nonce via `proxy.ts` is a possible future upgrade.
 3. **Rate limits are per-instance memory + shared Postgres counters**: correct but eventually consistent across serverless instances (sub-second windows).
 4. **HIBP breached-password check fails open** on network errors (logged as `HIBP_UNAVAILABLE`) to avoid locking users out when the service is down.
-5. **No email provider** (per decision): password resets and MFA recovery are admin-driven or self-service with an existing session only.
+5. **Email is opt-in and provider-scoped** (Resend): QR codes are emailed only when `RESEND_API_KEY` is set and the visitor supplied an address; a send failure never blocks registration and is recorded as `QR_EMAIL_SENT/FAILURE`. Password resets and MFA recovery remain admin-driven or self-service with an existing session only — no email-based account recovery exists.
 6. **Single `SESSION_SECRET`**: rotating it invalidates encrypted MFA secrets; treat it like a database credential.
 7. **Kiosk first-name-only projection**: bystanders at the kiosk see the visitor's first name by design; last name is not returned to anonymous callers.

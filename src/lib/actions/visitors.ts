@@ -6,6 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { getSession, getRequestContext, type SessionUser } from "@/lib/auth";
 import { recordAudit } from "@/lib/audit";
+import { emailEnabled, sendQrEmail } from "@/lib/email";
 import { can, type Permission } from "@/lib/rbac";
 import { LIMITS, WINDOWS, rateLimit } from "@/lib/rate-limit";
 import { formString, registerVisitorSchema, uuidSchema } from "@/lib/validation";
@@ -17,6 +18,8 @@ export type ActionState = {
     visitorId: string;
     visitId: string;
     qrCode: string;
+    emailSent?: boolean;
+    emailTo?: string;
   };
 };
 
@@ -167,7 +170,7 @@ export async function registerVisitorAction(
   try {
     const department = await db.department.findUnique({
       where: { id: input.departmentId },
-      select: { id: true, isActive: true },
+      select: { id: true, name: true, isActive: true },
     });
     if (!department || !department.isActive) {
       return { success: false, message: "The selected department is unavailable." };
@@ -233,11 +236,39 @@ export async function registerVisitorAction(
       ip: ctx.ip,
       userAgent: ctx.userAgent,
       requestId: ctx.requestId,
-      meta: { channel: user ? "staff" : "kiosk", visitorId: visitor.id },
+      meta: {
+        channel: user ? (user.role === "SECURITY" ? "guard" : "staff") : "kiosk",
+        actorRole: user?.role ?? null,
+        visitorId: visitor.id,
+      },
     });
 
     revalidatePath("/dashboard");
     revalidatePath("/visitors");
+
+    let emailSent = false;
+    const emailTo = input.email && emailEnabled() ? input.email : undefined;
+    if (emailTo) {
+      emailSent = await sendQrEmail({
+        to: emailTo,
+        visitorName: `${visitor.firstName} ${visitor.lastName}`,
+        qrCode,
+        departmentName: department.name,
+        purpose: input.purpose,
+        expiresAt: visit.qrExpiresAt,
+      });
+      await recordAudit({
+        actorId: user?.userId,
+        actorEmail: user?.email,
+        action: "QR_EMAIL_SENT",
+        result: emailSent ? "SUCCESS" : "FAILURE",
+        targetType: "visit",
+        targetId: visit.id,
+        ip: ctx.ip,
+        requestId: ctx.requestId,
+        meta: { provider: "resend" },
+      });
+    }
 
     return {
       success: true,
@@ -246,6 +277,8 @@ export async function registerVisitorAction(
         visitorId: visitor.id,
         visitId: visit.id,
         qrCode,
+        emailSent,
+        emailTo,
       },
     };
   } catch (error) {
