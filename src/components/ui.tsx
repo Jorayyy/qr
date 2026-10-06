@@ -89,10 +89,67 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="text-xl font-bold tracking-tight">{title}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
         {subtitle ? <p className="mt-1 text-sm text-[var(--muted)]">{subtitle}</p> : null}
       </div>
       {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+    </div>
+  );
+}
+
+function initialsOf(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+/** Monochrome initials badge — stays on-brand instead of a rainbow of hues. */
+export function Avatar({ name, className }: { name: string; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cx(
+        "inline-flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full bg-[var(--brand-soft)] text-[11px] font-bold uppercase tracking-wide text-[var(--brand)]",
+        className
+      )}
+    >
+      {initialsOf(name)}
+    </span>
+  );
+}
+
+/** One segment of a metric strip. Siblings render their own dividers. */
+export function Metric({
+  label,
+  value,
+  delta,
+  hint,
+}: {
+  label: string;
+  value: number | string;
+  delta?: number | null;
+  hint?: string;
+}) {
+  const up = typeof delta === "number" && delta > 0;
+  const down = typeof delta === "number" && delta < 0;
+  return (
+    <div className="min-w-0 flex-1 px-5 py-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</p>
+      <div className="mt-1 flex items-baseline gap-2">
+        <p className="text-3xl font-bold tabular-nums tracking-tight">{value}</p>
+        {typeof delta === "number" && delta !== 0 && (
+          <span
+            className={cx(
+              "text-xs font-semibold tabular-nums",
+              up ? "text-emerald-600" : down ? "text-red-600" : "text-[var(--muted)]"
+            )}
+          >
+            {up ? "↑" : down ? "↓" : ""} {Math.abs(delta)}%
+          </span>
+        )}
+      </div>
+      {hint ? <p className="mt-0.5 truncate text-xs text-[var(--muted)]">{hint}</p> : null}
     </div>
   );
 }

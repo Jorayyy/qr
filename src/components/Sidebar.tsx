@@ -57,8 +57,8 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
               className={cx(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
                 isActive
-                  ? "bg-blue-50 text-[var(--brand)]"
-                  : "text-slate-600 hover:bg-blue-50 hover:text-[var(--brand)]"
+                  ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+                  : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
               )}
             >
               <Icon className="h-4 w-4" />
@@ -73,8 +73,8 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
             className={cx(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
               pathname.startsWith("/visitors/register")
-                ? "bg-blue-50 text-[var(--brand)]"
-                : "text-slate-600 hover:bg-blue-50 hover:text-[var(--brand)]"
+                ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+                : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
             )}
           >
             <UserPlus className="h-4 w-4" />
@@ -98,8 +98,8 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
                   className={cx(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
                     isActive
-                      ? "bg-blue-50 text-[var(--brand)]"
-                      : "text-slate-600 hover:bg-blue-50 hover:text-[var(--brand)]"
+                      ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+                      : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -124,8 +124,8 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
             className={cx(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
               pathname.startsWith("/account/security")
-                ? "bg-blue-50 text-[var(--brand)]"
-                : "text-slate-600 hover:bg-blue-50 hover:text-[var(--brand)]"
+                ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+                : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
             )}
           >
             <ShieldCheck className="h-4 w-4" />
@@ -136,8 +136,8 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
             className={cx(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
               pathname.startsWith("/account/password")
-                ? "bg-blue-50 text-[var(--brand)]"
-                : "text-slate-600 hover:bg-blue-50 hover:text-[var(--brand)]"
+                ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+                : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
             )}
           >
             <KeyRound className="h-4 w-4" />

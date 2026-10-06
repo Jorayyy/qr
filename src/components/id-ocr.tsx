@@ -152,7 +152,7 @@ export function IdOcrScanButton({ onExtract, tone = "light", className }: IdOcrP
         className={
           dark
             ? "flex w-full items-center justify-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-4 py-3.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20 disabled:opacity-50"
-            : "flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--border)] bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-[var(--brand)] hover:bg-blue-50 disabled:opacity-50"
+            : "flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--border)] bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-[var(--brand)] hover:bg-[var(--brand-soft)] disabled:opacity-50"
         }
       >
         <ScanLine className="h-4 w-4" />
