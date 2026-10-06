@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { getRequestContext, requirePermission } from "@/lib/auth";
 import { recordAudit } from "@/lib/audit";
 import { Card, CardHeader, Badge, EmptyState, PageHeader } from "@/components/ui";
+import { VisitControls } from "../actions-client";
 import {
   Mail,
   Phone,
@@ -174,6 +175,9 @@ export default async function VisitorDetailPage({
                     <QrCode className="h-3 w-3" />
                     <span className="font-mono">{v.qrCode}</span>
                   </div>
+
+                  {/* Admin-controlled entry/exit (works without scanning) */}
+                  <VisitControls visitId={v.id} status={v.status} />
 
                   {/* Building stops */}
                   {v.stops.length > 0 && (

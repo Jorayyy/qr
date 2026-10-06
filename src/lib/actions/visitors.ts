@@ -331,6 +331,7 @@ export async function checkInAction(visitId: string): Promise<VisitActionState> 
     revalidatePath("/dashboard");
     revalidatePath("/scanner");
     revalidatePath("/visitors");
+    revalidatePath("/visitors/[id]", "page");
     return { success: true, message: "Visitor checked in successfully!" };
   } catch (error) {
     console.error(
@@ -390,6 +391,7 @@ export async function checkOutAction(visitId: string): Promise<VisitActionState>
     revalidatePath("/dashboard");
     revalidatePath("/scanner");
     revalidatePath("/visitors");
+    revalidatePath("/visitors/[id]", "page");
     return { success: true, message: "Visitor checked out successfully!" };
   } catch (error) {
     console.error(
@@ -438,6 +440,7 @@ export async function cancelVisitAction(visitId: string): Promise<VisitActionSta
     revalidatePath("/dashboard");
     revalidatePath("/scanner");
     revalidatePath("/visitors");
+    revalidatePath("/visitors/[id]", "page");
     return { success: true, message: "Visit cancelled." };
   } catch (error) {
     console.error(
