@@ -171,7 +171,7 @@ export default async function VisitorsPage({
                         ) : (
                           <span className="flex flex-wrap gap-1">
                             {offices.slice(0, 2).map((name) => (
-                              <Badge key={name} tone="blue">
+                              <Badge key={name} tone="brand">
                                 {name}
                               </Badge>
                             ))}

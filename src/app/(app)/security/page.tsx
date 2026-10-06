@@ -140,7 +140,7 @@ async function UsersSection({ actorId }: { actorId: string }) {
                         {u.failedLogins > 0 && !locked && (
                           <Badge tone="amber">{u.failedLogins} fails</Badge>
                         )}
-                        {u.mustChangePassword && <Badge tone="blue">Pwd reset</Badge>}
+                        {u.mustChangePassword && <Badge tone="brand">Pwd reset</Badge>}
                       </div>
                     </td>
                     <td className="px-5 py-3">

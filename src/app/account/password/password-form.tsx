@@ -39,7 +39,7 @@ export function PasswordForm({ mustChange }: { mustChange: boolean }) {
           type="password"
           required
           autoComplete="current-password"
-          className="w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm focus:border-[var(--brand)] focus:ring-2 focus:ring-blue-100 focus:outline-none"
+          className="w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm focus:border-[var(--brand)] focus:ring-2 focus:ring-[#700000]/15 focus:outline-none"
         />
       </div>
 
@@ -53,7 +53,7 @@ export function PasswordForm({ mustChange }: { mustChange: boolean }) {
           type="password"
           required
           autoComplete="new-password"
-          className="w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm focus:border-[var(--brand)] focus:ring-2 focus:ring-blue-100 focus:outline-none"
+          className="w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm focus:border-[var(--brand)] focus:ring-2 focus:ring-[#700000]/15 focus:outline-none"
         />
         <p className="mt-1 text-xs text-[var(--muted)]">
           At least 12 characters, not similar to your name or email, and not a known breached
@@ -64,7 +64,7 @@ export function PasswordForm({ mustChange }: { mustChange: boolean }) {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-xl bg-[var(--brand)] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:bg-[var(--brand-strong)] disabled:opacity-50 disabled:pointer-events-none"
+        className="rounded-xl bg-[var(--brand)] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#700000]/20 transition hover:bg-[var(--brand-strong)] disabled:opacity-50 disabled:pointer-events-none"
       >
         {pending ? "Updating…" : "Update password"}
       </button>

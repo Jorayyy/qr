@@ -174,7 +174,7 @@ export default function KioskRegisterPage() {
               <button
                 type="submit"
                 disabled={!canFinish || pending}
-                className="mt-4 w-full rounded-2xl bg-white py-4 text-xl font-bold text-blue-700 shadow-xl transition hover:scale-[1.02] disabled:opacity-50"
+                className="mt-4 w-full rounded-2xl bg-white py-4 text-xl font-bold text-[var(--brand)] shadow-xl transition hover:scale-[1.02] disabled:opacity-50"
               >
                 {pending ? "Registering..." : "Register & Get QR Code"}
               </button>
@@ -184,29 +184,29 @@ export default function KioskRegisterPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">First Name *</label>
-              <input name="firstName" required className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Juan" />
+              <input name="firstName" required className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Juan" />
             </div>
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">Last Name *</label>
-              <input name="lastName" required className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Dela Cruz" />
+              <input name="lastName" required className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Dela Cruz" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">Phone (Optional)</label>
-              <input name="phone" type="tel" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="09XX XXX XXXX" />
+              <input name="phone" type="tel" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="09XX XXX XXXX" />
             </div>
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">Email (Optional)</label>
-              <input name="email" type="email" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="you@email.com" />
+              <input name="email" type="email" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="you@email.com" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">Company / School (Optional)</label>
-              <input name="company" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="University of..." />
+              <input name="company" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="University of..." />
             </div>
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">ID Type *</label>
@@ -221,7 +221,7 @@ export default function KioskRegisterPage() {
 
           <div>
             <label className="mb-1 block text-sm font-bold text-white/70">ID Number (Optional)</label>
-            <input name="idNumber" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="123456789" />
+            <input name="idNumber" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="123456789" />
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -264,33 +264,33 @@ export default function KioskRegisterPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">Host Name (Optional)</label>
-              <input name="hostName" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Prof. Dela Cruz" />
+              <input name="hostName" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Prof. Dela Cruz" />
             </div>
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">Host Department (Optional)</label>
-              <input name="hostDepartment" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Computer Science" />
+              <input name="hostDepartment" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Computer Science" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">Vehicle Type (Optional)</label>
-              <input name="vehicleType" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Sedan, SUV, Motorcycle" />
+              <input name="vehicleType" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Sedan, SUV, Motorcycle" />
             </div>
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">Vehicle Model (Optional)</label>
-              <input name="vehicleModel" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Toyota Vios" />
+              <input name="vehicleModel" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="Toyota Vios" />
             </div>
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">Plate Number (Optional)</label>
-              <input name="vehiclePlateNumber" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="ABC 1234" />
+              <input name="vehiclePlateNumber" className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none" placeholder="ABC 1234" />
             </div>
           </div>
 
           <button
             type="submit"
             disabled={pending}
-            className="w-full rounded-2xl bg-white py-4 text-xl font-bold text-blue-700 shadow-xl transition hover:scale-[1.02] hover:shadow-2xl disabled:opacity-50"
+            className="w-full rounded-2xl bg-white py-4 text-xl font-bold text-[var(--brand)] shadow-xl transition hover:scale-[1.02] hover:shadow-2xl disabled:opacity-50"
           >
             {pending ? "Registering..." : "Register & Get QR Code"}
           </button>

@@ -131,7 +131,7 @@ export default function KioskScanPage() {
           }}
           className={cx(
             "flex min-h-11 items-center rounded-xl px-6 py-3 font-bold transition",
-            mode === "camera" ? "bg-white text-blue-700" : "bg-white/10 text-white hover:bg-white/20"
+            mode === "camera" ? "bg-white text-[var(--brand)]" : "bg-white/10 text-white hover:bg-white/20"
           )}
         >
           <Camera className="mr-2 h-5 w-5" /> Camera
@@ -143,7 +143,7 @@ export default function KioskScanPage() {
           }}
           className={cx(
             "flex min-h-11 items-center rounded-xl px-6 py-3 font-bold transition",
-            mode === "manual" ? "bg-white text-blue-700" : "bg-white/10 text-white hover:bg-white/20"
+            mode === "manual" ? "bg-white text-[var(--brand)]" : "bg-white/10 text-white hover:bg-white/20"
           )}
         >
           <Keyboard className="mr-2 h-5 w-5" /> Manual
@@ -170,10 +170,10 @@ export default function KioskScanPage() {
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck={false}
-            className="w-full rounded-xl border-0 bg-white/10 px-4 py-4 text-center font-mono text-lg text-white placeholder-blue-300 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none sm:text-xl"
+            className="w-full rounded-xl border-0 bg-white/10 px-4 py-4 text-center font-mono text-lg text-white placeholder-white/40 backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none sm:text-xl"
             autoFocus
           />
-          <button type="submit" className="w-full rounded-xl bg-white py-4 text-lg font-bold text-blue-700 shadow-xl">
+          <button type="submit" className="w-full rounded-xl bg-white py-4 text-lg font-bold text-[var(--brand)] shadow-xl">
             Look Up
           </button>
         </form>
@@ -225,7 +225,7 @@ export default function KioskScanPage() {
             <button
               onClick={handleCheckIn}
               disabled={loading}
-              className="w-full rounded-xl bg-blue-600 py-4 text-lg font-bold text-white shadow-lg transition hover:bg-blue-700 disabled:opacity-50"
+              className="w-full rounded-xl bg-[var(--brand)] py-4 text-lg font-bold text-white shadow-lg transition hover:bg-[var(--brand-strong)] disabled:opacity-50"
             >
               <LogIn className="mr-2 inline h-5 w-5" />
               {loading ? "Processing..." : "Check In Now"}

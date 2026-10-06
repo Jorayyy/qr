@@ -79,7 +79,7 @@ function MfaSetup({ email }: { email: string }) {
           type="button"
           onClick={handleStart}
           disabled={starting}
-          className="rounded-xl bg-[var(--brand)] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:bg-[var(--brand-strong)] disabled:opacity-50 disabled:pointer-events-none"
+          className="rounded-xl bg-[var(--brand)] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#700000]/20 transition hover:bg-[var(--brand-strong)] disabled:opacity-50 disabled:pointer-events-none"
         >
           {starting ? "Preparing…" : "Set up authenticator app"}
         </button>
@@ -128,13 +128,13 @@ function MfaSetup({ email }: { email: string }) {
             required
             maxLength={10}
             placeholder="000000"
-            className="w-full max-w-xs rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm focus:border-[var(--brand)] focus:ring-2 focus:ring-blue-100 focus:outline-none"
+            className="w-full max-w-xs rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm focus:border-[var(--brand)] focus:ring-2 focus:ring-[#700000]/15 focus:outline-none"
           />
         </div>
         <button
           type="submit"
           disabled={verifying}
-          className="rounded-xl bg-[var(--brand)] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:bg-[var(--brand-strong)] disabled:opacity-50 disabled:pointer-events-none"
+          className="rounded-xl bg-[var(--brand)] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#700000]/20 transition hover:bg-[var(--brand-strong)] disabled:opacity-50 disabled:pointer-events-none"
         >
           {verifying ? "Verifying…" : "Verify and enable"}
         </button>
@@ -196,7 +196,7 @@ function MfaEnabled({ email }: { email: string }) {
             required
             autoComplete="current-password"
             placeholder="Confirm with your password"
-            className="w-full max-w-sm rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm focus:border-[var(--brand)] focus:ring-2 focus:ring-blue-100 focus:outline-none"
+            className="w-full max-w-sm rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm focus:border-[var(--brand)] focus:ring-2 focus:ring-[#700000]/15 focus:outline-none"
           />
           <div className="flex gap-2">
             <button
@@ -231,7 +231,7 @@ function MfaEnabled({ email }: { email: string }) {
             required
             autoComplete="current-password"
             placeholder="Confirm with your password"
-            className="w-full max-w-sm rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm focus:border-[var(--brand)] focus:ring-2 focus:ring-blue-100 focus:outline-none"
+            className="w-full max-w-sm rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm focus:border-[var(--brand)] focus:ring-2 focus:ring-[#700000]/15 focus:outline-none"
           />
           <button
             type="submit"

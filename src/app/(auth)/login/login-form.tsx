@@ -40,7 +40,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
         <button
           type="submit"
           disabled={mfaPending}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--brand)] px-3 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:bg-[var(--brand-strong)] hover:shadow-blue-500/40 disabled:opacity-50 disabled:pointer-events-none"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--brand)] px-3 py-3 text-sm font-semibold text-white shadow-lg shadow-[#700000]/25 transition hover:bg-[var(--brand-strong)] hover:shadow-[#700000]/40 disabled:opacity-50 disabled:pointer-events-none"
         >
           {mfaPending ? "Verifying…" : "Verify"}
         </button>
@@ -107,7 +107,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
       <button
         type="submit"
         disabled={loginPending}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--brand)] px-3 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:bg-[var(--brand-strong)] hover:shadow-blue-500/40 disabled:opacity-50 disabled:pointer-events-none"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--brand)] px-3 py-3 text-sm font-semibold text-white shadow-lg shadow-[#700000]/25 transition hover:bg-[var(--brand-strong)] hover:shadow-[#700000]/40 disabled:opacity-50 disabled:pointer-events-none"
       >
         {loginPending ? (
           <>

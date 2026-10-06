@@ -41,8 +41,8 @@ function formatDuration(start: Date | null, end: Date | null): string {
   return `${hours}h ${minutes}m`;
 }
 
-const STATUS_BADGE: Record<string, { tone: "blue" | "green" | "red" | "gray" }> = {
-  PENDING: { tone: "blue" },
+const STATUS_BADGE: Record<string, { tone: "brand" | "green" | "red" | "gray" }> = {
+  PENDING: { tone: "brand" },
   CHECKED_IN: { tone: "green" },
   CHECKED_OUT: { tone: "gray" },
   CANCELLED: { tone: "red" },
