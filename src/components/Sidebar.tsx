@@ -11,21 +11,25 @@ import {
   ShieldCheck,
   KeyRound,
   UserPlus,
+  type LucideIcon,
 } from "lucide-react";
 import { cx, buttonClass } from "@/components/ui";
 import { logoutAction } from "@/lib/actions/auth";
 import { can } from "@/lib/rbac";
 
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/visitors", label: "Visitors", icon: Users },
-  { href: "/scanner", label: "Scan QR", icon: ScanLine },
-] as const;
+type NavItem = { href: string; label: string; icon: LucideIcon; exclude?: string[] };
 
-const ADMIN_ITEMS = [
+const NAV_ITEMS: NavItem[] = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  // /visitors/register has its own entry below — without this it lit up both.
+  { href: "/visitors", label: "Visitors", icon: Users, exclude: ["/visitors/register"] },
+  { href: "/scanner", label: "Scan QR", icon: ScanLine },
+];
+
+const ADMIN_ITEMS: NavItem[] = [
   { href: "/departments", label: "Departments", icon: Building2 },
   { href: "/security", label: "Security", icon: ShieldCheck },
-] as const;
+];
 
 type SidebarProps = {
   userName?: string;
@@ -49,7 +53,9 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
       <nav className="flex-1 space-y-1 px-3 py-4">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname.startsWith(item.href);
+          const isActive =
+            pathname.startsWith(item.href) &&
+            !(item.exclude ?? []).some((prefix) => pathname.startsWith(prefix));
           return (
             <Link
               key={item.href}

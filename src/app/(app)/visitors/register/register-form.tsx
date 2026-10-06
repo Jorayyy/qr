@@ -113,10 +113,35 @@ export default function RegisterVisitorPage() {
   );
   const [departments, setDepartments] = useState<Array<{ id: string; name: string; building: string | null }>>([]);
   const formRef = useRef<HTMLFormElement>(null);
+  const [captured, setCaptured] = useState<OcrFields | null>(null);
+  const [destination, setDestination] = useState({ departmentId: "", purpose: "" });
 
   const handleOcr = (fields: OcrFields) => {
     applyOcrToForm(formRef.current, fields);
+    setCaptured(fields);
+    autoSubmittedRef.current = false;
   };
+
+  // An ID never says which office the visit is for, so a scan always stops two
+  // fields short — send the operator straight to them.
+  useEffect(() => {
+    if (!captured) return;
+    const el = formRef.current?.elements.namedItem("departmentId");
+    if (el instanceof HTMLElement) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [captured]);
+
+  const canFinish = Boolean(captured && destination.departmentId && destination.purpose);
+
+  // OCR mode finishes itself the moment those two fields land. `checkValidity`
+  // holds fire if the scan missed the name, so the operator can type it first.
+  const autoSubmittedRef = useRef(false);
+  useEffect(() => {
+    if (!canFinish || pending || autoSubmittedRef.current) return;
+    const form = formRef.current;
+    if (!form || !form.checkValidity()) return;
+    autoSubmittedRef.current = true;
+    form.requestSubmit();
+  }, [canFinish, pending]);
 
   useEffect(() => {
     fetch("/api/departments").then((r) => r.json()).then(setDepartments);
@@ -190,6 +215,27 @@ export default function RegisterVisitorPage() {
 
           <IdOcrScanButton onExtract={handleOcr} />
 
+          {captured && (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-emerald-700">
+                ID captured
+              </p>
+              <p className="mt-1 text-sm font-medium text-emerald-950">
+                {[captured.firstName, captured.lastName].filter(Boolean).join(" ") ||
+                  "Name not detected"}
+                {captured.idType ? ` · ${captured.idType.replace("_", " ")}` : ""}
+                {captured.idNumber ? ` · ${captured.idNumber}` : ""}
+              </p>
+              <p className="mt-1 text-xs text-emerald-700">
+                Choose the destination office and purpose below — an ID doesn&apos;t
+                carry them — then finish here.
+              </p>
+              <Button type="submit" disabled={!canFinish || pending} className="mt-3 w-full">
+                {pending ? "Registering..." : "Register visitor & generate QR"}
+              </Button>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="label">First Name *</label>
@@ -238,7 +284,15 @@ export default function RegisterVisitorPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="label">Department *</label>
-              <Select name="departmentId" required>
+              <Select
+                name="departmentId"
+                required
+                value={destination.departmentId}
+                onChange={(e) => setDestination((d) => ({ ...d, departmentId: e.target.value }))}
+                className={
+                  captured && !destination.departmentId ? "border-[var(--brand)]" : undefined
+                }
+              >
                 <option value="">Select department</option>
                 {departments.map((d) => (
                   <option key={d.id} value={d.id}>
@@ -249,7 +303,13 @@ export default function RegisterVisitorPage() {
             </div>
             <div>
               <label className="label">Purpose *</label>
-              <Select name="purpose" required>
+              <Select
+                name="purpose"
+                required
+                value={destination.purpose}
+                onChange={(e) => setDestination((d) => ({ ...d, purpose: e.target.value }))}
+                className={captured && !destination.purpose ? "border-[var(--brand)]" : undefined}
+              >
                 <option value="">Select purpose</option>
                 {PURPOSES.map((p) => (
                   <option key={p.value} value={p.value}>

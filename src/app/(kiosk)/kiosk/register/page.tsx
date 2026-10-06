@@ -76,10 +76,35 @@ export default function KioskRegisterPage() {
   );
   const [departments, setDepartments] = useState<Array<{ id: string; name: string; building: string | null }>>([]);
   const formRef = useRef<HTMLFormElement>(null);
+  const [captured, setCaptured] = useState<OcrFields | null>(null);
+  const [destination, setDestination] = useState({ departmentId: "", purpose: "" });
 
   const handleOcr = (fields: OcrFields) => {
     applyOcrToForm(formRef.current, fields);
+    setCaptured(fields);
+    autoSubmittedRef.current = false;
   };
+
+  // An ID never says which office the visit is for, so a scan always stops two
+  // fields short — send the visitor straight to them.
+  useEffect(() => {
+    if (!captured) return;
+    const el = formRef.current?.elements.namedItem("departmentId");
+    if (el instanceof HTMLElement) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [captured]);
+
+  const canFinish = Boolean(captured && destination.departmentId && destination.purpose);
+
+  // OCR mode finishes itself the moment those two fields land. `checkValidity`
+  // holds fire if the scan missed the name, so the visitor can type it first.
+  const autoSubmittedRef = useRef(false);
+  useEffect(() => {
+    if (!canFinish || pending || autoSubmittedRef.current) return;
+    const form = formRef.current;
+    if (!form || !form.checkValidity()) return;
+    autoSubmittedRef.current = true;
+    form.requestSubmit();
+  }, [canFinish, pending]);
 
   useEffect(() => {
     fetch("/api/departments").then((r) => r.json()).then(setDepartments);
@@ -131,6 +156,31 @@ export default function KioskRegisterPage() {
 
           <IdOcrScanButton onExtract={handleOcr} tone="dark" />
 
+          {captured && (
+            <div className="rounded-2xl border border-emerald-300/40 bg-emerald-400/15 p-5 backdrop-blur">
+              <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-emerald-300">
+                ID captured
+              </p>
+              <p className="mt-1 text-lg font-bold text-white">
+                {[captured.firstName, captured.lastName].filter(Boolean).join(" ") ||
+                  "Name not detected"}
+                {captured.idType ? ` · ${captured.idType.replace("_", " ")}` : ""}
+                {captured.idNumber ? ` · ${captured.idNumber}` : ""}
+              </p>
+              <p className="mt-1 text-sm text-emerald-200">
+                Pick the office you&apos;re visiting and your purpose below — an ID
+                doesn&apos;t carry them — then finish here.
+              </p>
+              <button
+                type="submit"
+                disabled={!canFinish || pending}
+                className="mt-4 w-full rounded-2xl bg-white py-4 text-xl font-bold text-blue-700 shadow-xl transition hover:scale-[1.02] disabled:opacity-50"
+              >
+                {pending ? "Registering..." : "Register & Get QR Code"}
+              </button>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">First Name *</label>
@@ -177,7 +227,15 @@ export default function KioskRegisterPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">Department Visiting *</label>
-              <select name="departmentId" required className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none">
+              <select
+                name="departmentId"
+                required
+                value={destination.departmentId}
+                onChange={(e) => setDestination((d) => ({ ...d, departmentId: e.target.value }))}
+                className={`w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none${
+                  captured && !destination.departmentId ? " ring-2 ring-emerald-300" : ""
+                }`}
+              >
                 <option value="" className="text-gray-900">Select department</option>
                 {departments.map((d) => (
                   <option key={d.id} value={d.id} className="text-gray-900">{d.name}</option>
@@ -186,7 +244,15 @@ export default function KioskRegisterPage() {
             </div>
             <div>
               <label className="mb-1 block text-sm font-bold text-white/70">Purpose *</label>
-              <select name="purpose" required className="w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none">
+              <select
+                name="purpose"
+                required
+                value={destination.purpose}
+                onChange={(e) => setDestination((d) => ({ ...d, purpose: e.target.value }))}
+                className={`w-full rounded-xl border-0 bg-white/10 px-4 py-3.5 text-lg text-white backdrop-blur focus:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none${
+                  captured && !destination.purpose ? " ring-2 ring-emerald-300" : ""
+                }`}
+              >
                 <option value="" className="text-gray-900">Select purpose</option>
                 {PURPOSES.map((p) => (
                   <option key={p.value} value={p.value} className="text-gray-900">{p.label}</option>
