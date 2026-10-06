@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Camera, RefreshCw } from "lucide-react";
 import { cx } from "@/components/ui";
-import type { Html5Qrcode } from "html5-qrcode";
 
-export type CameraState = "idle" | "loading" | "starting" | "ready" | "error";
+export type CameraState = "idle" | "loading" | "ready" | "error";
 
 type Props = {
   onScan: (text: string) => void;
@@ -14,18 +13,59 @@ type Props = {
   onStateChange?: (state: CameraState) => void;
 };
 
-const START_TIMEOUT_MS = 15000;
+const START_TIMEOUT_MS = 10_000;
+const SLOW_HINT_MS = 3_000;
+const SCAN_INTERVAL_MS = 150;
+const MAX_FRAME_WIDTH = 480;
 
-type BarcodeDetectorCtor = new (opts: { formats: string[] }) => {
-  detect(source: HTMLVideoElement): Promise<Array<{ rawValue?: string }>>;
-};
+type QrCodeResult = { data?: string } | null;
+type JsQrFn = (data: Uint8ClampedArray, width: number, height: number) => QrCodeResult;
+type Decoder = (source: HTMLVideoElement) => Promise<string | null> | string | null;
 
-type BarcodeDetectorWithFormats = BarcodeDetectorCtor & {
-  getSupportedFormats?: () => Promise<string[]>;
-};
+let cachedJsQr: Promise<JsQrFn | null> | null = null;
+
+function loadJsQr(): Promise<JsQrFn | null> {
+  cachedJsQr ??= import("jsqr")
+    .then((mod) => {
+      const fn = (mod as { default?: unknown }).default ?? mod;
+      return typeof fn === "function" ? (fn as unknown as JsQrFn) : null;
+    })
+    .catch(() => null);
+  return cachedJsQr;
+}
+
+/**
+ * `BarcodeDetector` exists on Android / ChromeOS / macOS Chrome. On Windows
+ * Chrome, Firefox and Safari it is missing, or present but advertising no QR
+ * support — so an *empty* format list means "fall back", not "go native".
+ */
+async function nativeQrDecoder(): Promise<Decoder | null> {
+  try {
+    const ctor = (
+      window as unknown as {
+        BarcodeDetector?: {
+          new (opts: { formats: string[] }): {
+            detect(source: HTMLVideoElement): Promise<Array<{ rawValue?: string }>>;
+          };
+          getSupportedFormats?: () => Promise<string[]>;
+        };
+      }
+    ).BarcodeDetector;
+    if (!ctor) return null;
+    const formats = ctor.getSupportedFormats ? await ctor.getSupportedFormats() : ["qr_code"];
+    if (!formats.includes("qr_code")) return null;
+    const detector = new ctor({ formats: ["qr_code"] });
+    return async (video) => {
+      const found = await detector.detect(video);
+      return found?.[0]?.rawValue || null;
+    };
+  } catch {
+    return null;
+  }
+}
 
 function describeError(err: unknown): string {
-  const name = err instanceof Error ? err.name : typeof err === "string" ? err : "";
+  const name = err instanceof Error ? err.name : "";
   if (name === "NotAllowedError" || name === "SecurityError") {
     return "Camera permission was denied. Allow camera access for this site, then try again.";
   }
@@ -41,229 +81,187 @@ function describeError(err: unknown): string {
 /**
  * Shared camera surface for every QR scanner in the app.
  *
- * Speed strategy (the old UI downloaded a 361 KB library before the preview
- * ever appeared, with no feedback):
- *  1. Native `BarcodeDetector` when the browser exposes it (Android Chrome) —
- *     no library download at all, camera starts immediately.
- *  2. Otherwise lazily import `html5-qrcode`, with a visible "loading /
- *     starting" state and a 15 s timeout so it can never hang silently.
- *
- * `qrbox` is computed from the viewfinder size instead of being hard-coded to
- * 250 px, and the forced 1:1 aspect ratio is gone — both made phone cameras
- * fail with an overconstrained error on some Android devices.
+ * The component owns the `<video>` element outright (getUserMedia + a decode
+ * loop), so there is no third-party layout code to negotiate with — the old
+ * forced 1:1 aspect ratio and fixed 250 px viewfinder made several phone
+ * cameras fail to start at all.
  */
 export function CameraViewport({ onScan, active, className, onStateChange }: Props) {
-  const rawId = useId();
-  const elementId = `qr-${rawId.replace(/[^a-zA-Z0-9]/g, "")}`;
-  const targetRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const html5Ref = useRef<Html5Qrcode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hintRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const abortedRef = useRef(false);
+  // Bumped on every teardown so a superseded start() (rapid Tap-to-restart,
+  // camera toggled mid-permission-prompt) can detect it is stale.
+  const genRef = useRef(0);
   const onScanRef = useRef(onScan);
-  const [state, setState] = useState<CameraState>("idle");
-  const [engine, setEngine] = useState<"native" | "fallback">("fallback");
-  const [message, setMessage] = useState("");
+  const handleScanRef = useRef<(text: string) => void>(() => undefined);
+  const [state, setState] = useState<CameraState>(active ? "loading" : "idle");
+  const [message, setMessage] = useState(active ? "Starting camera…" : "");
+  const [showSlowHint, setShowSlowHint] = useState(false);
+  // Derived while inactive so effects only ever touch external systems (the
+  // camera), never React state.
+  const current = active ? state : "idle";
 
   useEffect(() => {
     onScanRef.current = onScan;
   }, [onScan]);
 
   useEffect(() => {
-    onStateChange?.(state);
-  }, [state, onStateChange]);
+    onStateChange?.(current);
+  }, [current, onStateChange]);
 
-  const stopNative = useCallback(() => {
-    if (pollRef.current) {
-      clearInterval(pollRef.current);
-      pollRef.current = null;
-    }
+  const teardown = useCallback(() => {
+    genRef.current += 1;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (hintRef.current) clearTimeout(hintRef.current);
+    timeoutRef.current = null;
+    hintRef.current = null;
+    if (pollRef.current) clearInterval(pollRef.current);
+    pollRef.current = null;
     const stream = streamRef.current;
     streamRef.current = null;
     if (stream) {
       for (const track of stream.getTracks()) {
         try {
           track.stop();
-        } catch {}
+        } catch {
+          // Track may already be released.
+        }
       }
     }
     const video = videoRef.current;
     if (video) {
       try {
         video.srcObject = null;
-      } catch {}
+      } catch {
+        // Older Safari throws when the stream is already detached.
+      }
     }
   }, []);
 
-  const teardown = useCallback(() => {
-    abortedRef.current = true;
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    stopNative();
-    const scanner = html5Ref.current;
-    html5Ref.current = null;
-    if (scanner) {
-      try {
-        Promise.resolve(scanner.stop()).catch(() => {});
-        Promise.resolve(scanner.clear()).catch(() => {});
-      } catch {}
-    }
-  }, [stopNative]);
-
-  const handleScan = useCallback(
-    (text: string) => {
-      if (abortedRef.current) return;
-      const value = typeof text === "string" ? text.trim() : "";
-      if (!value) return;
-      teardown();
-      onScanRef.current(value);
-    },
-    [teardown]
-  );
-  const handleScanRef = useRef(handleScan);
-  useEffect(() => {
-    handleScanRef.current = handleScan;
-  }, [handleScan]);
-
   const start = useCallback(async () => {
     teardown();
-    abortedRef.current = false;
-    setEngine("fallback");
+    const gen = genRef.current;
+    const stale = () => genRef.current !== gen;
+
+    setShowSlowHint(false);
     setState("loading");
-    setMessage("Loading scanner…");
+    setMessage("Starting camera…");
 
     timeoutRef.current = setTimeout(() => {
-      if (abortedRef.current) return;
+      if (stale()) return;
       teardown();
       setMessage("The camera is taking too long to start. Try again, or enter the code manually.");
       setState("error");
     }, START_TIMEOUT_MS);
 
-    // 1) Native path — nothing to download.
-    try {
-      const BD = (window as unknown as { BarcodeDetector?: BarcodeDetectorWithFormats })
-        .BarcodeDetector;
-      if (BD && navigator.mediaDevices?.getUserMedia) {
-        const formats = BD.getSupportedFormats ? await BD.getSupportedFormats() : [];
-        if (formats.length === 0 || formats.includes("qr_code")) {
-          if (abortedRef.current) return;
-          setEngine("native");
-          setState("starting");
-          setMessage("Starting camera…");
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: { ideal: "environment" } },
-          });
-          if (abortedRef.current) {
-            for (const track of stream.getTracks()) track.stop();
-            return;
-          }
-          streamRef.current = stream;
-          const video = videoRef.current;
-          if (video) {
-            video.srcObject = stream;
-            await video.play();
-            if (abortedRef.current) return;
-            const detector = new BD({ formats: ["qr_code"] });
-            setState("ready");
-            if (timeoutRef.current) {
-              clearTimeout(timeoutRef.current);
-              timeoutRef.current = null;
-            }
-            let busy = false;
-            pollRef.current = setInterval(async () => {
-              if (abortedRef.current || busy) return;
-              busy = true;
-              try {
-                const found = await detector.detect(video);
-                const raw = found?.[0]?.rawValue;
-                if (raw) handleScanRef.current(raw);
-              } catch {
-                // Transient decode errors are expected — keep polling.
-              } finally {
-                busy = false;
-              }
-            }, 250);
-            return;
-          }
+    // A tap-to-retry affordance appears if the permission prompt or the
+    // camera is not ready within a few seconds — Safari does not always
+    // open the camera from an un-gesture'd getUserMedia call.
+    hintRef.current = setTimeout(() => {
+      if (!stale()) setShowSlowHint(true);
+    }, SLOW_HINT_MS);
+
+    const stopStream = (stream: MediaStream) => {
+      for (const track of stream.getTracks()) {
+        try {
+          track.stop();
+        } catch {
+          // Track may already be released.
         }
       }
-    } catch {
-      // Never leave a half-open native stream behind: the fallback path below
-      // opens its own camera and would otherwise fail with "camera in use".
-      stopNative();
-    }
+    };
 
-    if (abortedRef.current) return;
-
-    // 2) Fallback path — html5-qrcode, downloaded on demand.
     try {
-      setEngine("fallback");
-      setState("loading");
-      setMessage("Loading scanner…");
-      const { Html5Qrcode } = await import("html5-qrcode");
-      if (abortedRef.current) return;
-      setState("starting");
-      setMessage("Starting camera…");
-      const scanner = new Html5Qrcode(elementId, { verbose: false });
-      html5Ref.current = scanner;
-      await scanner.start(
-        { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
-            const target = Math.min(viewfinderWidth, viewfinderHeight) * 0.72;
-            const size = Math.min(280, Math.max(110, Math.round(target)));
-            return { width: size, height: size };
-          },
-        },
-        (decodedText: string) => handleScanRef.current(decodedText),
-        () => {}
-      );
-      if (abortedRef.current) return;
-      setState("ready");
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
+      // Both engines resolve while the permission prompt is still on screen,
+      // so the decoder download never sits in front of the live preview.
+      const [nativeDecode, jsQr, media] = await Promise.all([
+        nativeQrDecoder(),
+        loadJsQr(),
+        navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } },
+          audio: false,
+        }),
+      ]);
+
+      if (stale()) {
+        stopStream(media);
+        return;
       }
+
+      streamRef.current = media;
+      const video = videoRef.current;
+      if (!video) throw new Error("Camera view missing");
+      video.srcObject = media;
+      await video.play();
+      if (stale()) return;
+
+      const decoder: Decoder | null =
+        nativeDecode ?? (jsQr ? (source) => decodeJsQrFrame(jsQr, source, canvasRef) : null);
+      if (!decoder) throw new Error("No QR decoder available");
+
+      setState("ready");
+      setMessage("");
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (hintRef.current) clearTimeout(hintRef.current);
+      timeoutRef.current = null;
+      hintRef.current = null;
+      setShowSlowHint(false);
+
+      let busy = false;
+      pollRef.current = setInterval(async () => {
+        if (stale() || busy) return;
+        busy = true;
+        try {
+          const raw = await decoder(video);
+          if (raw && !stale()) handleScanRef.current(raw);
+        } catch {
+          // Transient decode errors are expected — keep scanning.
+        } finally {
+          busy = false;
+        }
+      }, SCAN_INTERVAL_MS);
     } catch (err) {
-      if (abortedRef.current) return;
+      if (stale()) return;
       teardown();
       setMessage(describeError(err));
       setState("error");
     }
-  }, [elementId, stopNative, teardown]);
+  }, [teardown]);
+
+  useEffect(() => {
+    handleScanRef.current = (text: string) => {
+      const value = typeof text === "string" ? text.trim() : "";
+      if (!value) return;
+      teardown();
+      onScanRef.current(value);
+    };
+  }, [teardown]);
 
   useEffect(() => {
     if (!active) {
       teardown();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setState((prev) => (prev === "idle" ? prev : "idle"));
       return;
     }
-    void start();
+    // Kicked off on the next tick: starting the camera sets React state, and
+    // doing that synchronously inside an effect cascades renders.
+    const kick = setTimeout(() => void start(), 0);
     return () => {
+      clearTimeout(kick);
       teardown();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active]);
-
-  // Unmount safety net.
-  useEffect(() => teardown, [teardown]);
-
-  const containerClass = cx(
-    "relative w-full overflow-hidden rounded-xl bg-black",
-    (state !== "ready" || engine === "native") && "aspect-[4/3]",
-    className
-  );
+  }, [active, start, teardown]);
 
   return (
-    <div className={containerClass}>
-      {engine !== "native" && <div id={elementId} ref={targetRef} className="w-full" />}
-
+    <div
+      className={cx(
+        "relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-black",
+        className
+      )}
+    >
       <video
         ref={videoRef}
         playsInline
@@ -271,38 +269,65 @@ export function CameraViewport({ onScan, active, className, onStateChange }: Pro
         autoPlay
         aria-hidden
         className={cx(
-          "absolute inset-0 h-full w-full object-cover",
-          engine !== "native" && "hidden"
+          "absolute inset-0 h-full w-full object-cover transition-opacity",
+          current === "ready" ? "opacity-100" : "opacity-0"
         )}
       />
 
-      {state !== "ready" && (
+      {current !== "ready" && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
-          {state === "error" ? (
+          {current === "error" ? (
             <Camera className="h-10 w-10 text-white/40" />
           ) : (
             <span className="h-9 w-9 animate-spin rounded-full border-2 border-white/25 border-t-white" />
           )}
           <p className="max-w-xs text-sm text-white/85">
-            {state === "idle" ? "Camera is off." : message}
+            {current === "idle" ? "Camera is off." : message}
           </p>
-          {state !== "error" && state !== "idle" && (
+          {current !== "error" && current !== "idle" && (
             <span className="h-1 w-40 overflow-hidden rounded-full bg-white/20">
               <span className="block h-full w-1/3 animate-pulse rounded-full bg-white/70" />
             </span>
           )}
-          {state === "error" && (
+          {active && (current === "error" || showSlowHint) && (
             <button
               type="button"
               onClick={() => void start()}
-              className="mt-1 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900"
+              className="mt-1 inline-flex min-h-11 items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-900"
             >
               <RefreshCw className="h-4 w-4" />
-              Try again
+              {current === "error" ? "Try again" : "Tap to start camera"}
             </button>
           )}
         </div>
       )}
     </div>
   );
+}
+
+function decodeJsQrFrame(
+  jsQr: JsQrFn,
+  video: HTMLVideoElement,
+  canvasRef: React.MutableRefObject<HTMLCanvasElement | null>
+): string | null {
+  const width = video.videoWidth;
+  const height = video.videoHeight;
+  if (!width || !height) return null;
+
+  canvasRef.current ??= document.createElement("canvas");
+  const canvas = canvasRef.current;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return null;
+
+  const scale = Math.min(1, MAX_FRAME_WIDTH / width);
+  const w = Math.max(1, Math.round(width * scale));
+  const h = Math.max(1, Math.round(height * scale));
+  if (canvas.width !== w || canvas.height !== h) {
+    canvas.width = w;
+    canvas.height = h;
+  }
+
+  ctx.drawImage(video, 0, 0, w, h);
+  const frame = ctx.getImageData(0, 0, w, h);
+  return jsQr(frame.data, frame.width, frame.height)?.data ?? null;
 }
