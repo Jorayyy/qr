@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { Card, CardHeader, EmptyState, Avatar, Metric, cx } from "@/components/ui";
 import { RelativeTime } from "@/components/relative-time";
+import { manilaMidnight, manilaParts } from "@/lib/ph-time";
 import { ArrowRight } from "lucide-react";
 
 const DAY_START_HOUR = 7;
@@ -21,11 +22,7 @@ const STATUS_DOT: Record<string, string> = {
   CANCELLED: "bg-red-500",
 };
 
-function startOfDay(d: Date): Date {
-  const copy = new Date(d);
-  copy.setHours(0, 0, 0, 0);
-  return copy;
-}
+
 
 function ArrivalsChart({
   buckets,
@@ -78,11 +75,10 @@ function ArrivalsChart({
 
 /** Shared visitor overview — identical for every role and reused by /dashboard and /security. */
 export async function DashboardOverview() {
-  const today = startOfDay(new Date());
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  const nowParts = manilaParts(new Date());
+  const today = manilaMidnight(nowParts.year, nowParts.month, nowParts.day);
+  const yesterday = manilaMidnight(nowParts.year, nowParts.month, nowParts.day - 1);
+  const tomorrow = manilaMidnight(nowParts.year, nowParts.month, nowParts.day + 1);
 
   const [totalToday, yesterdayTotal, checkedIn, checkedOut, pending, todaysVisits, openStops, recentVisits] =
     await Promise.all([
@@ -114,7 +110,7 @@ export async function DashboardOverview() {
   }));
   for (const visit of todaysVisits) {
     const at = visit.actualArrival ?? visit.createdAt;
-    const hour = new Date(at).getHours();
+    const hour = manilaParts(at).hour;
     const bucket = buckets.find((b) => b.hour === hour);
     if (bucket) bucket.count += 1;
   }
