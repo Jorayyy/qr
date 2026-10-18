@@ -39,6 +39,17 @@ export default function PhotoCapture({
     };
   }, [preview]);
 
+  // The <video> element only mounts after `cameraOn` flips, so attach the
+  // stream here rather than in startCamera (where the ref is still null).
+  useEffect(() => {
+    const video = videoRef.current;
+    const stream = streamRef.current;
+    if (cameraOn && video && stream) {
+      video.srcObject = stream;
+      void video.play().catch(() => {});
+    }
+  }, [cameraOn]);
+
   async function upload(blob: Blob, filename: string) {
     setBusy(true);
     setError("");
@@ -69,10 +80,6 @@ export default function PhotoCapture({
       });
       streamRef.current = stream;
       setCameraOn(true);
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
     } catch {
       setError("Camera unavailable. You can upload a photo instead.");
       stopCamera();
@@ -114,7 +121,13 @@ export default function PhotoCapture({
         {preview ? (
           <img src={preview} alt={label} className="mx-auto max-h-56 w-auto rounded-lg bg-white object-contain" />
         ) : cameraOn ? (
-          <video ref={videoRef} playsInline muted className="mx-auto max-h-56 w-full rounded-lg bg-black object-cover" />
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className="mx-auto max-h-56 w-full rounded-lg bg-black object-cover"
+          />
         ) : (
           <div className="flex h-40 items-center justify-center text-xs text-[var(--muted)]">
             No photo yet
