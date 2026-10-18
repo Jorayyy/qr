@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { safeCallbackUrl } from "@/lib/validation";
@@ -31,6 +32,15 @@ export default async function LoginPage({
       <div className="rounded-2xl border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-xl">
         <h2 className="mb-4 text-sm font-bold tracking-tight text-white">Sign in to your account</h2>
         <LoginForm callbackUrl={safeCallback ?? undefined} />
+      </div>
+
+      <div className="mt-6 text-center">
+        <Link
+          href="/"
+          className="inline-block rounded-xl px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
+        >
+          ← Back to welcome page
+        </Link>
       </div>
     </>
   );
