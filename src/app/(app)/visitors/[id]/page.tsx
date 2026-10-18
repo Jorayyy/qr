@@ -118,6 +118,43 @@ export default async function VisitorDetailPage({
               <CreditCard className="h-4 w-4 text-[var(--muted)]" />
               <span>{visitor.idType.replace("_", " ")}{visitor.idNumber ? ` — ${visitor.idNumber}` : ""}</span>
             </div>
+
+            {(visitor.photoUrl || visitor.idPhotoUrl) && (
+              <div className="grid grid-cols-2 gap-3 border-t border-[var(--border)] pt-4">
+                {visitor.photoUrl && (
+                  <div>
+                    <p className="mb-1 text-xs text-[var(--muted)]">Visitor Photo</p>
+                    <a
+                      href={`/api/visitor-photo?path=${encodeURIComponent(visitor.photoUrl)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <img
+                        src={`/api/visitor-photo?path=${encodeURIComponent(visitor.photoUrl)}`}
+                        alt="Visitor photo"
+                        className="h-40 w-full rounded-lg border border-[var(--border)] bg-slate-50 object-cover"
+                      />
+                    </a>
+                  </div>
+                )}
+                {visitor.idPhotoUrl && (
+                  <div>
+                    <p className="mb-1 text-xs text-[var(--muted)]">ID Photo</p>
+                    <a
+                      href={`/api/visitor-photo?path=${encodeURIComponent(visitor.idPhotoUrl)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <img
+                        src={`/api/visitor-photo?path=${encodeURIComponent(visitor.idPhotoUrl)}`}
+                        alt="ID photo"
+                        className="h-40 w-full rounded-lg border border-[var(--border)] bg-slate-50 object-contain"
+                      />
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </Card>
 

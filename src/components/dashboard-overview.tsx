@@ -217,7 +217,7 @@ export async function DashboardOverview() {
                 {recentVisits.map((v) => (
                   <tr key={v.id} className="transition-colors hover:bg-slate-50">
                     <td className="px-5 py-3">
-                      <Link href={`/visitors/${v.id}`} className="flex items-center gap-3">
+                      <Link href={`/visitors/${v.visitor.id}`} className="flex items-center gap-3">
                         <Avatar name={`${v.visitor.firstName} ${v.visitor.lastName}`} />
                         <span className="font-medium">{`${v.visitor.firstName} ${v.visitor.lastName}`}</span>
                       </Link>
