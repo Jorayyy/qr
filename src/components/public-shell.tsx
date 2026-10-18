@@ -8,9 +8,10 @@ export const GLASS = "rounded-2xl border border-white/20 bg-white/10 shadow-2xl 
  * Photo background + logo header + footer for every visitor-facing page, so
  * they all match the login screen. Pages constrain their own content width.
  */
-export function PublicShell({ children, right }: { children: React.ReactNode; right?: React.ReactNode }) {
+/** Photo background with the maroon tint + dark gradient used behind all public pages. */
+export function Backdrop() {
   return (
-    <div className="relative min-h-[100dvh] overflow-hidden">
+    <>
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/bg.jpg')" }}
@@ -21,6 +22,14 @@ export function PublicShell({ children, right }: { children: React.ReactNode; ri
         className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80"
         aria-hidden
       />
+    </>
+  );
+}
+
+export function PublicShell({ children, right }: { children: React.ReactNode; right?: React.ReactNode }) {
+  return (
+    <div className="relative min-h-[100dvh] overflow-hidden">
+      <Backdrop />
 
       <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-5xl flex-col px-4 py-6 sm:px-6">
         <header className="flex items-center justify-between gap-3">
