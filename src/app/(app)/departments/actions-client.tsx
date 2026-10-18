@@ -2,7 +2,12 @@
 
 import { useActionState } from "react";
 import { toggleDepartmentAction, deleteDepartmentAction } from "@/lib/actions/departments";
+import { pill } from "@/components/ui";
 import { ToggleLeft, ToggleRight, Trash2 } from "lucide-react";
+
+const DEACTIVATE_PILL = pill("amber");
+const ACTIVATE_PILL = pill("emerald");
+const DELETE_PILL = pill("red");
 
 export function ToggleForm({ departmentId, isActive }: { departmentId: string; isActive: boolean }) {
   const [state, formAction, pending] = useActionState(
@@ -10,26 +15,15 @@ export function ToggleForm({ departmentId, isActive }: { departmentId: string; i
     { success: false, message: "" }
   );
 
+  const style = isActive ? DEACTIVATE_PILL : ACTIVATE_PILL;
+
   return (
     <form action={formAction}>
-      <button
-        type="submit"
-        disabled={pending}
-        className={`text-xs font-medium hover:underline disabled:opacity-50 ${
-          isActive ? "text-amber-600" : "text-emerald-600"
-        }`}
-      >
-        {isActive ? (
-          <>
-            <ToggleRight className="inline h-3 w-3 mr-1" />
-            Deactivate
-          </>
-        ) : (
-          <>
-            <ToggleLeft className="inline h-3 w-3 mr-1" />
-            Activate
-          </>
-        )}
+      <button type="submit" disabled={pending} className={style.outer}>
+        <span className={style.chip}>
+          {isActive ? <ToggleRight className="h-3.5 w-3.5" /> : <ToggleLeft className="h-3.5 w-3.5" />}
+        </span>
+        {isActive ? "Deactivate" : "Activate"}
       </button>
       {state.message && !state.success && (
         <p className="mt-1 text-[10px] text-red-600">{state.message}</p>
@@ -59,10 +53,12 @@ export function DeleteForm({
       <button
         type="submit"
         disabled={pending || !canDelete}
-        className="text-xs font-medium text-red-600 hover:underline disabled:opacity-30 disabled:pointer-events-none"
+        className={DELETE_PILL.outer}
         title={canDelete ? "Delete department" : "Cannot delete — has associated visits/stops"}
       >
-        <Trash2 className="inline h-3 w-3 mr-1" />
+        <span className={DELETE_PILL.chip}>
+          <Trash2 className="h-3.5 w-3.5" />
+        </span>
         Delete
       </button>
       {state.message && !state.success && (
