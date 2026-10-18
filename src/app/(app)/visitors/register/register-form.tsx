@@ -261,29 +261,12 @@ export default function RegisterVisitorPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="label">Host Name (Optional)</label>
-              <Input name="hostName" />
-            </div>
-            <div>
-              <label className="label">Host Department (Optional)</label>
-              <Input name="hostDepartment" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div>
-              <label className="label">Vehicle Type (Optional)</label>
-              <Input name="vehicleType" placeholder="e.g. Sedan, SUV, Motorcycle" />
-            </div>
-            <div>
-              <label className="label">Vehicle Model (Optional)</label>
-              <Input name="vehicleModel" placeholder="e.g. Toyota Vios" />
-            </div>
-            <div>
-              <label className="label">Plate Number (Optional)</label>
-              <Input name="vehiclePlateNumber" placeholder="e.g. ABC 1234" />
+          <div>
+            <label className="label">Vehicle (Optional)</label>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <Input name="vehicleType" aria-label="Vehicle type" placeholder="e.g. Sedan" className="min-w-0" />
+              <Input name="vehicleModel" aria-label="Vehicle model" placeholder="e.g. Vios" className="min-w-0" />
+              <Input name="vehiclePlateNumber" aria-label="Plate number" placeholder="e.g. ABC 1234" className="min-w-0" />
             </div>
           </div>
 

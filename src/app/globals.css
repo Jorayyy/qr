@@ -46,29 +46,33 @@ body {
   }
 }
 
-.field {
-  width: 100%;
-  min-height: 2.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--border);
-  background: #fff;
-  padding: 0.625rem 0.75rem;
-  font-size: 0.9375rem;
-  color: var(--foreground);
-  outline: none;
-}
-.field:focus {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgb(112 0 0 / 0.15);
-}
-.label {
-  display: block;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.375rem;
+/* Inside @layer components so Tailwind utilities (e.g. pl-9 for a leading
+   icon) can still override these values. */
+@layer components {
+  .field {
+    width: 100%;
+    min-height: 2.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    background: #fff;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.9375rem;
+    color: var(--foreground);
+    outline: none;
+  }
+  .field:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgb(112 0 0 / 0.15);
+  }
+  .label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.375rem;
+  }
 }
 
 @media print {
