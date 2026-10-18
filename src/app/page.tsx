@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { buttonClass } from "@/components/ui";
-import { VisitQr } from "@/components/visit-qr";
 import {
   SITE,
   ENTRY_STEPS,
@@ -34,7 +33,11 @@ export default async function Home() {
         style={{ backgroundImage: "url('/bg.jpg')" }}
         aria-hidden
       />
-      <div className="absolute inset-0 bg-black/40" aria-hidden />
+      <div className="absolute inset-0 bg-[var(--brand)]/40" aria-hidden />
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80"
+        aria-hidden
+      />
 
       <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-5xl flex-col px-4 py-6 sm:px-6">
         <header className="flex items-center justify-between gap-3">
@@ -56,37 +59,26 @@ export default async function Home() {
         </header>
 
         <main className="flex-1 py-10 sm:py-14">
-          <section className="grid items-center gap-8 lg:grid-cols-2">
-            <div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] text-white backdrop-blur-xl">
-                <QrCode className="h-4 w-4" />
-                QR Entry System
-              </span>
-              <h1 className="mt-4 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
-                Welcome to {SITE.shortName}
-              </h1>
-              <p className="mt-4 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
-                Visiting the campus? Scan the QR code to see how entry works, then
-                our staff at the Front Desk will register your visit and give you a
-                personal QR pass.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/visit" className={buttonClass("secondary", "px-6 py-3 text-base")}>
-                  How to enter
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-                <Link href="#steps" className={buttonClass("ghost", "px-6 py-3 text-base text-white hover:bg-white/15")}>
-                  See the steps
-                </Link>
-              </div>
-            </div>
-
-            <div className="rounded-3xl bg-white/95 p-6 text-center shadow-2xl">
-              <p className="text-sm font-bold uppercase tracking-[0.08em] text-[var(--brand)]">Scan to begin</p>
-              <p className="mt-1 text-sm text-[var(--muted)]">Point your phone camera here</p>
-              <div className="mt-4">
-                <VisitQr />
-              </div>
+          <section className="mx-auto max-w-2xl text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] text-white backdrop-blur-xl">
+              <QrCode className="h-4 w-4" />
+              QR Entry System
+            </span>
+            <h1 className="mt-4 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
+              Welcome to {SITE.shortName}
+            </h1>
+            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
+              Visiting the campus? Our staff at the Front Desk will register your
+              visit, take your photo, and give you a personal QR pass to enter.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link href="/visit" className={buttonClass("secondary", "px-6 py-3 text-base")}>
+                How to enter
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+              <Link href="#steps" className={buttonClass("ghost", "px-6 py-3 text-base text-white hover:bg-white/15")}>
+                See the steps
+              </Link>
             </div>
           </section>
 
