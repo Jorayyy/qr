@@ -40,12 +40,12 @@ export default async function ReportsPage({
   const { start, end, label } = resolveReportRange(period);
   const range = { gte: start, lt: end };
 
-  const [registered, arrived, departed, cancelled, byDepartment, byPurpose, byStatus, departments] =
+  const [registered, arrived, exited, cancelled, byDepartment, byPurpose, byStatus, departments] =
     await Promise.all([
       db.visit.count({ where: { createdAt: range } }),
-      db.visit.count({ where: { actualArrival: range } }),
-      db.visit.count({ where: { actualDeparture: range } }),
-      db.visit.count({ where: { status: "CANCELLED", createdAt: range } }),
+      db.visit.count({ where: { createdAt: range, status: { in: ["CHECKED_IN", "CHECKED_OUT"] } } }),
+      db.visit.count({ where: { createdAt: range, status: "CHECKED_OUT" } }),
+      db.visit.count({ where: { createdAt: range, status: "CANCELLED" } }),
       db.visit.groupBy({ by: ["departmentId"], where: { createdAt: range }, _count: { _all: true } }),
       db.visit.groupBy({ by: ["purpose"], where: { createdAt: range }, _count: { _all: true } }),
       db.visit.groupBy({ by: ["status"], where: { createdAt: range }, _count: { _all: true } }),
@@ -90,10 +90,10 @@ export default async function ReportsPage({
 
       <Card className="mb-6 overflow-hidden">
         <div className="flex flex-col divide-y divide-[var(--border)] sm:flex-row sm:divide-x sm:divide-y-0">
-          <Metric label="Registered" value={registered} hint="in this period" />
-          <Metric label="Arrived" value={arrived} hint="checked in" />
-          <Metric label="Exited" value={departed} hint="checked out" />
-          <Metric label="Cancelled" value={cancelled} hint="cancelled visits" />
+          <Metric label="Registered" value={registered} hint="visits in this period" />
+          <Metric label="Arrived" value={arrived} hint="of those, checked in" />
+          <Metric label="Exited" value={exited} hint="of those, checked out" />
+          <Metric label="Cancelled" value={cancelled} hint="of those, cancelled" />
         </div>
       </Card>
 
@@ -124,7 +124,7 @@ export default async function ReportsPage({
 
         <div className="space-y-4">
           <Card>
-            <CardHeader title="By purpose" />
+            <CardHeader title="By purpose" subtitle="Registrations in this period" />
             {byPurpose.length === 0 ? (
               <EmptyState title="No data" />
             ) : (
