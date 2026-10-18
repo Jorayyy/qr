@@ -10,7 +10,6 @@ import {
   Building2,
   ShieldCheck,
   FileBarChart,
-  KeyRound,
   UserPlus,
   type LucideIcon,
 } from "lucide-react";
@@ -127,30 +126,6 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
           </div>
         )}
         <div className="space-y-1">
-          <Link
-            href="/account/security"
-            className={cx(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[0.9375rem] font-medium transition",
-              pathname.startsWith("/account/security")
-                ? "bg-[var(--brand-soft)] text-[var(--brand)]"
-                : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
-            )}
-          >
-            <ShieldCheck className="h-4 w-4" />
-            Two-factor auth
-          </Link>
-          <Link
-            href="/account/password"
-            className={cx(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[0.9375rem] font-medium transition",
-              pathname.startsWith("/account/password")
-                ? "bg-[var(--brand-soft)] text-[var(--brand)]"
-                : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
-            )}
-          >
-            <KeyRound className="h-4 w-4" />
-            Change password
-          </Link>
           <form action={logoutAction}>
             <button type="submit" className={buttonClass("ghost", "w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700")}>
               <LogOut className="h-4 w-4" />

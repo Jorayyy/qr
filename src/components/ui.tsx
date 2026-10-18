@@ -38,7 +38,7 @@ export function iconActionClass(tone: PillTone = "brand", extra?: string): strin
     red: "bg-red-100 text-red-600 hover:bg-red-600 hover:text-white",
   };
   return cx(
-    "inline-flex h-9 w-9 items-center justify-center rounded-lg transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none",
+    "inline-flex size-10 shrink-0 items-center justify-center rounded-xl transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none",
     tones[tone],
     extra
   );
