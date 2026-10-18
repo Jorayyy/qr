@@ -1,5 +1,5 @@
 /**
- * Visitor-facing reference content for the public entry pages (/ and /visit).
+ * Visitor-facing reference content for the public entry page.
  *
  * NOTE: the contact details and office hours below are PLACEHOLDERS — replace
  * them with the university's real front-desk information before going live.
@@ -20,7 +20,7 @@ export const SITE = {
 export const ENTRY_STEPS = [
   {
     title: "Scan the entry QR",
-    body: "Point your phone camera at the QR code at the gate, or scan the one on the welcome page.",
+    body: "Point your phone camera at the QR code posted at the gate to open this page.",
   },
   {
     title: "Go to the Front Desk",

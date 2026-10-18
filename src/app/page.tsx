@@ -10,7 +10,6 @@ import {
   PRIVACY_NOTICE,
 } from "@/lib/site-info";
 import {
-  ArrowRight,
   CheckCircle2,
   Clock,
   LogIn,
@@ -43,8 +42,9 @@ export default async function Home() {
           Welcome to {SITE.shortName}
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
-          Already have a QR pass? Check yourself in below. New visitor? See how
-          entry works — our Front Desk will register your visit and issue your pass.
+          Already have a QR pass? Check yourself in. New visitor? The steps
+          below show how entry works — our Front Desk will register your visit
+          and issue your pass.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
@@ -53,10 +53,6 @@ export default async function Home() {
           >
             <LogIn className="h-5 w-5" />
             I have a pass — check in
-          </Link>
-          <Link href="/visit" className={buttonClass("secondary", "px-6 py-3 text-base")}>
-            How to enter
-            <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
       </section>
@@ -136,12 +132,6 @@ export default async function Home() {
         <p className="mt-3 max-w-3xl text-sm leading-relaxed text-white/85">{PRIVACY_NOTICE}</p>
       </section>
 
-      <div className="mt-10 text-center">
-        <Link href="/visit" className={buttonClass("secondary", "px-6 py-3 text-base")}>
-          Open the full visitor guide
-          <ArrowRight className="h-5 w-5" />
-        </Link>
-      </div>
     </PublicShell>
   );
 }

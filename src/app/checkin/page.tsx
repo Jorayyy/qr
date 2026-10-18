@@ -33,7 +33,7 @@ export default function CheckinPage() {
 
         <div className="mt-6 text-center">
           <Link
-            href="/visit"
+            href="/"
             className="text-sm font-semibold text-white/80 underline-offset-2 hover:text-white hover:underline"
           >
             New visitor? See how to enter
