@@ -64,38 +64,6 @@ function staffProjection(visit: {
   };
 }
 
-/**
- * Kiosk (unauthenticated) projection — no email, phone, ID number, company,
- * notes or vehicle data. Knowing the QR is what authorizes this much.
- */
-function kioskProjection(visit: {
-  id: string;
-  status: string;
-  purpose: string;
-  qrExpiresAt: Date | null;
-  actualArrival: Date | null;
-  visitor: { firstName: string };
-  department: { name: string };
-  stops: Array<{
-    id: string;
-    checkedInAt: Date;
-    checkedOutAt: Date | null;
-    building: string | null;
-    department: { name: string };
-  }>;
-}) {
-  return {
-    id: visit.id,
-    status: visit.status,
-    purpose: visit.purpose,
-    qrExpiresAt: visit.qrExpiresAt,
-    actualArrival: visit.actualArrival,
-    visitor: { firstName: visit.visitor.firstName },
-    department: { name: visit.department.name },
-    stops: visit.stops,
-  };
-}
-
 export async function GET(req: NextRequest) {
   return withApiHandler(req, async ({ requestId, ip }) => {
     const rawQr = req.nextUrl.searchParams.get("qr");
@@ -106,12 +74,15 @@ export async function GET(req: NextRequest) {
     const qr = parsedQr.data;
 
     const user = await getSession();
+    if (!user) return jsonError(401, "Authentication required.", requestId);
 
     const ipLimit = await rateLimit(`lookup:ip:${ip ?? "unknown"}`, LIMITS.lookupPerIp(), WINDOWS.short);
     const qrLimit = await rateLimit(`lookup:qr:${qr}`, LIMITS.lookupPerQr(), WINDOWS.short);
-    const userLimit = user
-      ? await rateLimit(`lookup:user:${user.userId}`, LIMITS.lookupPerUser(), WINDOWS.short)
-      : { ok: true as const, remaining: 0 };
+    const userLimit = await rateLimit(
+      `lookup:user:${user.userId}`,
+      LIMITS.lookupPerUser(),
+      WINDOWS.short
+    );
 
     if (!ipLimit.ok || !qrLimit.ok || !userLimit.ok) {
       const retry =
@@ -154,7 +125,7 @@ export async function GET(req: NextRequest) {
         ip,
         requestId,
         // The submitted QR value itself is intentionally not persisted.
-        meta: { reason: "not_found", channel: user ? "staff" : "kiosk" },
+        meta: { reason: "not_found" },
       });
       return jsonError(404, "Visit not found", requestId);
     }
@@ -172,7 +143,7 @@ export async function GET(req: NextRequest) {
         targetId: visit.id,
         ip,
         requestId,
-        meta: { reason: expired ? "expired" : "revoked", channel: user ? "staff" : "kiosk" },
+        meta: { reason: expired ? "expired" : "revoked" },
       });
       return jsonError(403, "This QR code is no longer valid.", requestId);
     }
@@ -186,10 +157,9 @@ export async function GET(req: NextRequest) {
       targetId: visit.id,
       ip,
       requestId,
-      meta: { channel: user ? "staff" : "kiosk" },
     });
 
-    const body = user ? staffProjection(visit) : kioskProjection(visit);
+    const body = staffProjection(visit);
     const res = jsonOk(body);
     for (const [key, value] of Object.entries(NO_STORE)) res.headers.set(key, value);
     return res;

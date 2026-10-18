@@ -15,6 +15,7 @@ import {
 } from "@/lib/actions/admin";
 import { USER_ROLES } from "@/lib/validation";
 import { Badge, Card, CardHeader, EmptyState, PageHeader } from "@/components/ui";
+import { DashboardOverview } from "@/components/dashboard-overview";
 import { CreateUserForm, RoleSelect, RowAction } from "./security-client";
 
 const TABS = [
@@ -53,7 +54,9 @@ export default async function SecurityPage({
         subtitle="Users, sessions and audit trail"
       />
 
-      <div className="mb-5 flex gap-1 border-b border-[var(--border)]">
+      <DashboardOverview />
+
+      <div className="mt-6 mb-5 flex gap-1 border-b border-[var(--border)]">
         {allowed.map((t) => (
           <Link
             key={t.key}

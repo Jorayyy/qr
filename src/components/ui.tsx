@@ -12,7 +12,7 @@ export function cx(...classes: Array<string | false | null | undefined>): string
 type ButtonVariant = "primary" | "secondary" | "danger" | "ghost" | "success";
 export function buttonClass(variant: ButtonVariant = "primary", extra?: string): string {
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition disabled:opacity-50 disabled:pointer-events-none";
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition disabled:opacity-50 disabled:pointer-events-none";
   const variants: Record<ButtonVariant, string> = {
     primary: "bg-[var(--brand)] text-white hover:bg-[var(--brand-strong)]",
     secondary: "border border-[var(--border)] bg-white text-[var(--foreground)] hover:bg-slate-50",

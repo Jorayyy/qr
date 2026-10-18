@@ -131,15 +131,16 @@ function formDataToInput(formData: FormData) {
 
 /**
  * Registers a visitor and issues their QR credential.
- * Public by design (kiosk walk-ups) — protected by strict validation, rate
- * limits and audit logging rather than a session.
+ * Staff-only: the kiosk/public registration path was removed, so this now
+ * requires an authenticated user with visitor:write.
  */
 export async function registerVisitorAction(
   _prev: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const ctx = await getRequestContext();
-  const user = await getSession();
+  const auth = await guard("visitor:write", "VISITOR_REGISTERED");
+  if (!auth) return { success: false, message: DENIED.message };
+  const { user, ctx } = auth;
 
   const ipLimit = await rateLimit(
     `register:ip:${ctx.ip ?? "unknown"}`,
@@ -147,9 +148,11 @@ export async function registerVisitorAction(
     WINDOWS.hour
   );
   const globalLimit = await rateLimit("register:global", LIMITS.registerGlobal(), WINDOWS.hour);
-  const userLimit = user
-    ? await rateLimit(`register:user:${user.userId}`, LIMITS.registerPerUser(), WINDOWS.hour)
-    : { ok: true as const, remaining: 0 };
+  const userLimit = await rateLimit(
+    `register:user:${user.userId}`,
+    LIMITS.registerPerUser(),
+    WINDOWS.hour
+  );
 
   if (!ipLimit.ok || !globalLimit.ok || !userLimit.ok) {
     return {
@@ -237,8 +240,8 @@ export async function registerVisitorAction(
       userAgent: ctx.userAgent,
       requestId: ctx.requestId,
       meta: {
-        channel: user ? (user.role === "SECURITY" ? "guard" : "staff") : "kiosk",
-        actorRole: user?.role ?? null,
+        channel: user.role === "SECURITY" ? "guard" : "staff",
+        actorRole: user.role,
         visitorId: visitor.id,
       },
     });

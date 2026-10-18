@@ -9,6 +9,7 @@ import {
   ScanLine,
   Building2,
   ShieldCheck,
+  FileBarChart,
   KeyRound,
   UserPlus,
   type LucideIcon,
@@ -28,6 +29,7 @@ const NAV_ITEMS: NavItem[] = [
 
 const ADMIN_ITEMS: NavItem[] = [
   { href: "/departments", label: "Departments", icon: Building2 },
+  { href: "/reports", label: "Reports", icon: FileBarChart },
   { href: "/security", label: "Security", icon: ShieldCheck },
 ];
 
@@ -61,7 +63,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
               key={item.href}
               href={item.href}
               className={cx(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[0.9375rem] font-medium transition",
                 isActive
                   ? "bg-[var(--brand-soft)] text-[var(--brand)]"
                   : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
@@ -77,7 +79,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
           <Link
             href="/visitors/register"
             className={cx(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[0.9375rem] font-medium transition",
               pathname.startsWith("/visitors/register")
                 ? "bg-[var(--brand-soft)] text-[var(--brand)]"
                 : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
@@ -102,7 +104,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
                   key={item.href}
                   href={item.href}
                   className={cx(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[0.9375rem] font-medium transition",
                     isActive
                       ? "bg-[var(--brand-soft)] text-[var(--brand)]"
                       : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
@@ -128,7 +130,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
           <Link
             href="/account/security"
             className={cx(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[0.9375rem] font-medium transition",
               pathname.startsWith("/account/security")
                 ? "bg-[var(--brand-soft)] text-[var(--brand)]"
                 : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
@@ -140,7 +142,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
           <Link
             href="/account/password"
             className={cx(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[0.9375rem] font-medium transition",
               pathname.startsWith("/account/password")
                 ? "bg-[var(--brand-soft)] text-[var(--brand)]"
                 : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"

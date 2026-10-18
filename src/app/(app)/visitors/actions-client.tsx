@@ -62,7 +62,7 @@ export function VisitControls({
           onClick={() => run(() => checkOutAction(visitId))}
         >
           <LogOut className="h-3.5 w-3.5" />
-          {pending ? "Working..." : "Mark as Departed"}
+          {pending ? "Working..." : "Mark as Exited"}
         </Button>
       )}
 

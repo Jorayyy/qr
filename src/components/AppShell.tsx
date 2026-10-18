@@ -43,7 +43,7 @@ export function AppShell({ children, userName, userRole }: Props) {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Open navigation"
-          className="-ml-1 flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100"
+          className="-ml-1 flex h-11 w-11 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100"
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -74,7 +74,7 @@ export function AppShell({ children, userName, userRole }: Props) {
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Close navigation"
-              className="absolute -right-11 top-3 flex h-9 w-9 items-center justify-center rounded-lg bg-white/90 text-slate-600 shadow"
+              className="absolute -right-12 top-3 flex h-11 w-11 items-center justify-center rounded-lg bg-white/90 text-slate-600 shadow"
             >
               <X className="h-5 w-5" />
             </button>
