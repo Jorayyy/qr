@@ -1,11 +1,9 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { Card, Badge, Button, PageHeader, EmptyState, pill } from "@/components/ui";
+import { Card, Badge, Button, PageHeader, EmptyState, iconActionClass } from "@/components/ui";
 import { Plus, Pencil } from "lucide-react";
 import { requirePermission } from "@/lib/auth";
 import { ToggleForm, DeleteForm } from "./actions-client";
-
-const EDIT_PILL = pill("brand");
 
 export default async function DepartmentsPage() {
   await requirePermission("department:manage");
@@ -64,12 +62,14 @@ export default async function DepartmentsPage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-1 border-t border-[var(--border)] px-4 py-2.5">
-                <Link href={`/departments/${d.id}/edit`} className={EDIT_PILL.outer}>
-                  <span className={EDIT_PILL.chip}>
-                    <Pencil className="h-3.5 w-3.5" />
-                  </span>
-                  Edit
+              <div className="flex flex-wrap items-center gap-1.5 border-t border-[var(--border)] px-4 py-2.5">
+                <Link
+                  href={`/departments/${d.id}/edit`}
+                  className={iconActionClass("brand")}
+                  title="Edit department"
+                  aria-label="Edit department"
+                >
+                  <Pencil className="h-4 w-4" />
                 </Link>
                 <ToggleForm departmentId={d.id} isActive={d.isActive} />
                 <DeleteForm departmentId={d.id} visitCount={d._count.visits} stopCount={d._count.visitStops} />

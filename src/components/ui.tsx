@@ -29,33 +29,19 @@ export function Button({ variant = "primary", className, ...props }: ButtonHTMLA
 
 type PillTone = "brand" | "amber" | "emerald" | "red";
 
-/**
- * Compact row action as a pill with an icon chip that fills with colour on
- * hover. `chip` wraps the icon; `outer` is the link/button itself.
- */
-export function pill(tone: PillTone = "brand"): { outer: string; chip: string } {
-  const tones: Record<PillTone, { outer: string; chip: string }> = {
-    brand: {
-      outer: "text-[var(--brand)] hover:bg-[var(--brand-soft)]",
-      chip: "bg-[var(--brand-soft)] text-[var(--brand)] group-hover:bg-[var(--brand)] group-hover:text-white",
-    },
-    amber: {
-      outer: "text-amber-700 hover:bg-amber-50",
-      chip: "bg-amber-100 text-amber-700 group-hover:bg-amber-500 group-hover:text-white",
-    },
-    emerald: {
-      outer: "text-emerald-700 hover:bg-emerald-50",
-      chip: "bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white",
-    },
-    red: {
-      outer: "text-red-600 hover:bg-red-50",
-      chip: "bg-red-100 text-red-600 group-hover:bg-red-600 group-hover:text-white",
-    },
+/** Square icon-only action: tinted face that fills with colour on hover. */
+export function iconActionClass(tone: PillTone = "brand", extra?: string): string {
+  const tones: Record<PillTone, string> = {
+    brand: "bg-[var(--brand-soft)] text-[var(--brand)] hover:bg-[var(--brand)] hover:text-white",
+    amber: "bg-amber-100 text-amber-700 hover:bg-amber-500 hover:text-white",
+    emerald: "bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white",
+    red: "bg-red-100 text-red-600 hover:bg-red-600 hover:text-white",
   };
-  const outer =
-    "group inline-flex min-h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none";
-  const chip = "flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition";
-  return { outer: cx(outer, tones[tone].outer), chip: cx(chip, tones[tone].chip) };
+  return cx(
+    "inline-flex h-9 w-9 items-center justify-center rounded-lg transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none",
+    tones[tone],
+    extra
+  );
 }
 
 export function Card({ children, className }: { children: React.ReactNode; className?: string }) {
