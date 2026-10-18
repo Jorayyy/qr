@@ -24,28 +24,28 @@ export const ENTRY_STEPS = [
   },
   {
     title: "Go to the Front Desk",
-    body: "Present a valid ID to the guard or receptionist so they can register your visit.",
+    body: "Present a valid ID to the guard or receptionist so they can register your visit and take your photo.",
   },
   {
     title: "Get your QR pass",
-    body: "Our staff issues your personal QR pass — it can be emailed to you if you give an address.",
+    body: "Our staff issues your personal QR pass with a pass code — it can be emailed to you if you give an address.",
   },
   {
     title: "Scan to enter",
-    body: "Scan your pass at the entrance or the office you are visiting to record your arrival.",
+    body: "Scan your pass at the entrance, or check yourself in with your pass code and ID number on the check-in page.",
   },
   {
     title: "Scan to exit",
-    body: "Scan your pass again on the way out so the system records that you have left.",
+    body: "Scan your pass again on the way out, or use the check-in page, so the system records that you have left.",
   },
 ] as const;
 
 export const ENTRY_REQUIREMENTS = [
-  "A valid ID — SSS, TIN, Passport, or Student ID",
+  "A valid ID — SSS, TIN, Passport, or Student ID (we photograph it and you for your pass)",
   "The name of the person or office you are visiting",
   "The purpose of your visit",
   "An email address if you would like your pass emailed (optional)",
 ] as const;
 
 export const PRIVACY_NOTICE =
-  "We record your name, contact details, ID type and number, and visit details to manage entry and keep the campus safe. This information is used only for visitor management and kept according to the university's records policy. For questions or requests about your data, please contact the Front Desk.";
+  "We record your name, contact details, ID type and number, a photo of you and your ID, and visit details to manage entry and keep the campus safe. This information is used only for visitor management and kept according to the university's records policy. For questions or requests about your data, please contact the Front Desk.";

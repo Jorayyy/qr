@@ -22,7 +22,12 @@ type VisitResult = {
   actualArrival?: string | null;
   actualDeparture?: string | null;
   qrCode?: string;
-  visitor?: { firstName?: string; lastName?: string } | null;
+  visitor?: {
+    firstName?: string;
+    lastName?: string;
+    photoUrl?: string | null;
+    idPhotoUrl?: string | null;
+  } | null;
   department?: { name?: string } | null;
   stops?: VisitStopInfo[];
 };
@@ -290,6 +295,31 @@ export default function ScannerPage() {
                 </div>
               )}
             </div>
+
+            {(result.visitor?.photoUrl || result.visitor?.idPhotoUrl) && (
+              <div className="grid grid-cols-2 gap-3">
+                {result.visitor?.photoUrl && (
+                  <div>
+                    <p className="text-xs text-[var(--muted)]">Visitor Photo</p>
+                    <img
+                      src={`/api/visitor-photo?path=${encodeURIComponent(result.visitor.photoUrl)}`}
+                      alt="Visitor"
+                      className="mt-1 h-40 w-full rounded-lg border border-[var(--border)] bg-slate-50 object-cover"
+                    />
+                  </div>
+                )}
+                {result.visitor?.idPhotoUrl && (
+                  <div>
+                    <p className="text-xs text-[var(--muted)]">ID Photo</p>
+                    <img
+                      src={`/api/visitor-photo?path=${encodeURIComponent(result.visitor.idPhotoUrl)}`}
+                      alt="ID"
+                      className="mt-1 h-40 w-full rounded-lg border border-[var(--border)] bg-slate-50 object-contain"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             {feedback && (
               <div className="flex items-center gap-2 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-700">

@@ -19,6 +19,18 @@ const requiredText = (max: number, label: string) =>
     .min(1, `${label} is required.`)
     .max(max, `${label} must be at most ${max} characters.`);
 
+/** Reference to a privately stored photo: a blob pathname under `visitors/`. */
+const optionalPhotoPath = z
+  .string()
+  .trim()
+  .max(300)
+  .optional()
+  .transform((value) => (value === "" ? undefined : value))
+  .refine(
+    (value) => value === undefined || /^visitors\/[A-Za-z0-9._/-]+$/.test(value),
+    "Invalid photo reference."
+  );
+
 export const emailField = z
   .string()
   .trim()
@@ -54,6 +66,8 @@ export const registerVisitorSchema = z
     company: optionalText(120),
     idType: z.enum(ID_TYPES),
     idNumber: optionalText(64),
+    photoUrl: optionalPhotoPath,
+    idPhotoUrl: optionalPhotoPath,
     departmentId: z.string().uuid("Invalid department."),
     purpose: z.enum(PURPOSES),
     hostName: optionalText(120),
@@ -105,6 +119,13 @@ export const checkoutSchema = z
   .refine((value) => Boolean(value.qr || value.visitId), {
     message: "qr or visitId is required",
   });
+
+export const selfCheckinSchema = z
+  .object({
+    qr: qrLookupSchema,
+    idNumber: z.string().trim().min(1, "ID number is required.").max(64),
+  })
+  .strict();
 
 export const mfaCodeSchema = z
   .object({

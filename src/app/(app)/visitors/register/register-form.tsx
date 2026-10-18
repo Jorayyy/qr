@@ -2,6 +2,7 @@
 
 import { useActionState, useRef, useEffect, useState } from "react";
 import { Card, CardHeader, Input, Select, Button } from "@/components/ui";
+import PhotoCapture from "@/components/photo-capture";
 import { registerVisitorAction, type ActionState } from "@/lib/actions/visitors";
 import { ArrowLeft, CheckCircle, Download, Printer } from "lucide-react";
 import Link from "next/link";
@@ -110,6 +111,8 @@ export default function RegisterVisitorPage() {
     { success: false, message: "" }
   );
   const [departments, setDepartments] = useState<Array<{ id: string; name: string; building: string | null }>>([]);
+  const [facePath, setFacePath] = useState<string | null>(null);
+  const [idPath, setIdPath] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/departments").then((r) => r.json()).then(setDepartments);
@@ -225,6 +228,13 @@ export default function RegisterVisitorPage() {
             <label className="label">ID Number (Optional)</label>
             <Input name="idNumber" />
           </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <PhotoCapture label="Visitor Photo" kind="face" facing="user" onPath={setFacePath} />
+            <PhotoCapture label="ID Photo" kind="id" facing="environment" onPath={setIdPath} />
+          </div>
+          <input type="hidden" name="photoUrl" value={facePath ?? ""} />
+          <input type="hidden" name="idPhotoUrl" value={idPath ?? ""} />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>

@@ -30,6 +30,8 @@ function staffProjection(visit: {
     company: string | null;
     idType: string;
     idNumber: string | null;
+    photoUrl: string | null;
+    idPhotoUrl: string | null;
   };
   department: { id: string; name: string; building: string | null };
   stops: Array<{
@@ -58,6 +60,8 @@ function staffProjection(visit: {
       company: visit.visitor.company,
       idType: visit.visitor.idType,
       idNumber: visit.visitor.idNumber,
+      photoUrl: visit.visitor.photoUrl,
+      idPhotoUrl: visit.visitor.idPhotoUrl,
     },
     department: visit.department,
     stops: visit.stops,
@@ -105,6 +109,8 @@ export async function GET(req: NextRequest) {
             company: true,
             idType: true,
             idNumber: true,
+            photoUrl: true,
+            idPhotoUrl: true,
           },
         },
         department: { select: { id: true, name: true, building: true } },

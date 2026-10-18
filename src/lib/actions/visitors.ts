@@ -115,6 +115,8 @@ function formDataToInput(formData: FormData) {
     "company",
     "idType",
     "idNumber",
+    "photoUrl",
+    "idPhotoUrl",
     "departmentId",
     "purpose",
     "hostName",
@@ -196,6 +198,8 @@ export async function registerVisitorAction(
           company: input.company,
           idType: input.idType,
           idNumber: input.idNumber,
+          ...(input.photoUrl ? { photoUrl: input.photoUrl } : {}),
+          ...(input.idPhotoUrl ? { idPhotoUrl: input.idPhotoUrl } : {}),
         },
       });
     } else {
@@ -208,6 +212,8 @@ export async function registerVisitorAction(
           company: input.company,
           idType: input.idType,
           idNumber: input.idNumber,
+          photoUrl: input.photoUrl,
+          idPhotoUrl: input.idPhotoUrl,
         },
       });
     }

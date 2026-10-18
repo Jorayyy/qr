@@ -104,8 +104,11 @@ export default function VisitGuidePage() {
           <p className="mt-3 text-sm leading-relaxed text-slate-700">{PRIVACY_NOTICE}</p>
         </section>
 
-        <div className="mt-8 flex justify-center pb-6">
-          <Link href="/" className={buttonClass("primary", "px-6 py-3 text-base")}>
+        <div className="mt-8 flex flex-wrap justify-center gap-3 pb-6">
+          <Link href="/checkin" className={buttonClass("primary", "px-6 py-3 text-base")}>
+            I have a pass — check in
+          </Link>
+          <Link href="/" className={buttonClass("secondary", "px-6 py-3 text-base")}>
             Back to welcome page
           </Link>
         </div>

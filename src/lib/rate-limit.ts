@@ -93,4 +93,5 @@ export const LIMITS = {
   registerGlobal: () => intFromEnv("RATE_REGISTER_GLOBAL", 600, 1, 1_000_000),
   searchPerUser: () => intFromEnv("RATE_SEARCH_USER", 60, 1, 100_000),
   departmentsPerIp: () => intFromEnv("RATE_DEPARTMENTS_IP", 120, 1, 100_000),
+  uploadPerUser: () => intFromEnv("RATE_UPLOAD_USER", 60, 1, 10_000),
 } as const;

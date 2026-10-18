@@ -8,6 +8,7 @@ import {
   registerVisitorSchema,
   safeCallbackUrl,
   searchQuerySchema,
+  selfCheckinSchema,
 } from "@/lib/validation";
 
 describe("safeCallbackUrl", () => {
@@ -144,6 +145,26 @@ describe("registerVisitorSchema", () => {
     }
   });
 
+  it("accepts private blob pathnames and rejects foreign ones", () => {
+    const ok = registerVisitorSchema.safeParse({
+      ...valid,
+      photoUrl: "visitors/abc-123/face.jpg",
+      idPhotoUrl: "visitors/abc-123/id.jpg",
+    });
+    expect(ok.success).toBe(true);
+    expect(registerVisitorSchema.safeParse({ ...valid, photoUrl: "../etc/passwd" }).success).toBe(false);
+    expect(registerVisitorSchema.safeParse({ ...valid, photoUrl: "https://evil.example/x.jpg" }).success).toBe(false);
+  });
+
+  it("treats an empty photo path as absent", () => {
+    const result = registerVisitorSchema.safeParse({ ...valid, photoUrl: "", idPhotoUrl: "" });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.photoUrl).toBeUndefined();
+      expect(result.data.idPhotoUrl).toBeUndefined();
+    }
+  });
+
   it("rejects unknown fields", () => {
     expect(registerVisitorSchema.safeParse({ ...valid, isAdmin: true }).success).toBe(false);
   });
@@ -163,6 +184,27 @@ describe("registerVisitorSchema", () => {
     expect(registerVisitorSchema.safeParse({ ...valid, firstName: "a".repeat(101) }).success).toBe(
       false
     );
+  });
+});
+
+describe("selfCheckinSchema", () => {
+  it("accepts a pass code with an ID number", () => {
+    const result = selfCheckinSchema.safeParse({ qr: "VMS-0123456789ABCDEF0123456789ABCDEF", idNumber: "2023-0001" });
+    expect(result.success).toBe(true);
+  });
+
+  it("requires both factors", () => {
+    const qr = "VMS-0123456789ABCDEF0123456789ABCDEF";
+    expect(selfCheckinSchema.safeParse({ qr }).success).toBe(false);
+    expect(selfCheckinSchema.safeParse({ idNumber: "2023-0001" }).success).toBe(false);
+    expect(selfCheckinSchema.safeParse({ qr, idNumber: "" }).success).toBe(false);
+    expect(selfCheckinSchema.safeParse({ qr: "bad qr", idNumber: "2023-0001" }).success).toBe(false);
+  });
+
+  it("rejects unknown fields", () => {
+    expect(
+      selfCheckinSchema.safeParse({ qr: "VMS-0123456789ABCDEF0123456789ABCDEF", idNumber: "1", role: "ADMIN" }).success
+    ).toBe(false);
   });
 });
 
