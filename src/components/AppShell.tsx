@@ -36,9 +36,9 @@ export function AppShell({ children, userName, userRole }: Props) {
   }, [open]);
 
   return (
-    <div className="flex h-[100dvh] flex-col overflow-hidden bg-[var(--background)] lg:flex-row">
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-[var(--background)] print:block print:h-auto print:overflow-visible lg:flex-row">
       {/* Phone/tablet header */}
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--border)] bg-white px-4 lg:hidden">
+      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--border)] bg-white px-4 print:hidden lg:hidden">
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -51,13 +51,13 @@ export function AppShell({ children, userName, userRole }: Props) {
       </header>
 
       {/* Desktop sidebar */}
-      <div className="hidden shrink-0 lg:block">
+      <div className="hidden shrink-0 print:hidden lg:block">
         <Sidebar userName={userName} userRole={userRole} />
       </div>
 
       {/* Phone/tablet drawer */}
       {open && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-50 print:hidden lg:hidden">
           <div
             className="absolute inset-0 bg-slate-900/50"
             onClick={() => setOpen(false)}
@@ -83,7 +83,7 @@ export function AppShell({ children, userName, userRole }: Props) {
         </div>
       )}
 
-      <main className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+      <main className="min-w-0 flex-1 overflow-y-auto p-4 print:overflow-visible print:p-0 sm:p-6">{children}</main>
     </div>
   );
 }
