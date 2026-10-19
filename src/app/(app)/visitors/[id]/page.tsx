@@ -191,7 +191,7 @@ export default async function VisitorDetailPage({
           </div>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-1">
           <CardHeader title="Visit History" subtitle={`${visitor.visits.length} visit(s)`} />
           {visitor.visits.length === 0 ? (
             <EmptyState title="No visits yet" hint="This visitor has no recorded visits." />
