@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { Card, Badge, Button, PageHeader, EmptyState, iconActionClass } from "@/components/ui";
-import { Plus, Pencil, Building2 } from "lucide-react";
+import { Plus, Pencil, GraduationCap } from "lucide-react";
 import { requirePermission } from "@/lib/auth";
 import { ToggleForm, DeleteForm } from "./actions-client";
 
@@ -39,9 +39,10 @@ export default async function DepartmentsPage() {
               key={d.id}
               className="group relative flex aspect-square flex-col overflow-hidden transition-shadow hover:shadow-md"
             >
-              <Building2
+              <GraduationCap
                 aria-hidden
-                className="pointer-events-none absolute -bottom-7 -right-6 h-44 w-44 text-[var(--brand)]/[0.06] transition-colors group-hover:text-[var(--brand)]/10"
+                strokeWidth={1.25}
+                className="pointer-events-none absolute -bottom-8 -right-8 h-56 w-56 text-[var(--brand)]/10 transition-colors group-hover:text-[var(--brand)]/15"
               />
 
               <div className="relative flex flex-1 flex-col justify-between gap-3 p-4">
