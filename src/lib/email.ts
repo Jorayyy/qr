@@ -169,14 +169,16 @@ export async function sendQrEmail(input: QrEmailInput): Promise<boolean> {
       to: input.to,
       subject,
       html: buildHtml(input),
-      attachments: [
-        {
-          filename: `qr-${input.qrCode}.png`,
-          content: png,
-          contentType: "image/png",
-          contentId: "qrcode",
-        },
-      ],
+        attachments: [
+          {
+            filename: `qr-${input.qrCode}.png`,
+            // Resend serializes the payload with JSON.stringify, so a Buffer
+            // would become {"type":"Buffer",...}. The API expects base64.
+            content: png.toString("base64"),
+            contentType: "image/png",
+            contentId: "qrcode",
+          },
+        ],
     });
 
     if (error) {

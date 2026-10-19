@@ -123,7 +123,6 @@ export const checkoutSchema = z
 export const selfCheckinSchema = z
   .object({
     qr: qrLookupSchema,
-    idNumber: z.string().trim().min(1, "ID number is required.").max(64),
   })
   .strict();
 

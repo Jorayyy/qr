@@ -14,7 +14,6 @@ type Result = { action: "CHECKED_IN" | "CHECKED_OUT"; visitorName: string; depar
 
 export default function CheckinForm() {
   const [qr, setQr] = useState("");
-  const [idNumber, setIdNumber] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<Result | null>(null);
@@ -29,7 +28,7 @@ export default function CheckinForm() {
       const res = await fetch("/api/visits/self-checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qr: qr.trim(), idNumber: idNumber.trim() }),
+        body: JSON.stringify({ qr: qr.trim() }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error ?? "Check-in failed.");
@@ -70,7 +69,6 @@ export default function CheckinForm() {
           onClick={() => {
             setResult(null);
             setQr("");
-            setIdNumber("");
           }}
         >
           Done
@@ -125,21 +123,6 @@ export default function CheckinForm() {
           </div>
         )}
         <p className="mt-1 text-xs text-white/60">The code printed on your visitor pass.</p>
-      </div>
-
-      <div>
-        <label className={LABEL} htmlFor="id-number">
-          ID number
-        </label>
-        <input
-          id="id-number"
-          value={idNumber}
-          onChange={(e) => setIdNumber(e.target.value)}
-          placeholder="The ID number you presented at the Front Desk"
-          autoComplete="off"
-          required
-          className={INPUT}
-        />
       </div>
 
       <button

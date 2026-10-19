@@ -188,22 +188,20 @@ describe("registerVisitorSchema", () => {
 });
 
 describe("selfCheckinSchema", () => {
-  it("accepts a pass code with an ID number", () => {
-    const result = selfCheckinSchema.safeParse({ qr: "VMS-0123456789ABCDEF0123456789ABCDEF", idNumber: "2023-0001" });
+  it("accepts a pass code", () => {
+    const result = selfCheckinSchema.safeParse({ qr: "VMS-0123456789ABCDEF0123456789ABCDEF" });
     expect(result.success).toBe(true);
   });
 
-  it("requires both factors", () => {
-    const qr = "VMS-0123456789ABCDEF0123456789ABCDEF";
-    expect(selfCheckinSchema.safeParse({ qr }).success).toBe(false);
-    expect(selfCheckinSchema.safeParse({ idNumber: "2023-0001" }).success).toBe(false);
-    expect(selfCheckinSchema.safeParse({ qr, idNumber: "" }).success).toBe(false);
-    expect(selfCheckinSchema.safeParse({ qr: "bad qr", idNumber: "2023-0001" }).success).toBe(false);
+  it("requires a pass code", () => {
+    expect(selfCheckinSchema.safeParse({}).success).toBe(false);
+    expect(selfCheckinSchema.safeParse({ qr: "" }).success).toBe(false);
+    expect(selfCheckinSchema.safeParse({ qr: "bad qr" }).success).toBe(false);
   });
 
   it("rejects unknown fields", () => {
     expect(
-      selfCheckinSchema.safeParse({ qr: "VMS-0123456789ABCDEF0123456789ABCDEF", idNumber: "1", role: "ADMIN" }).success
+      selfCheckinSchema.safeParse({ qr: "VMS-0123456789ABCDEF0123456789ABCDEF", role: "ADMIN" }).success
     ).toBe(false);
   });
 });

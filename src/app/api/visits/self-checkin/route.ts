@@ -6,12 +6,11 @@ import { isSameOrigin, jsonError, jsonOk, rateLimitResponse, withApiHandler } fr
 import { selfCheckinSchema } from "@/lib/validation";
 
 /** Deliberately vague so it cannot confirm whether a pass code exists. */
-const NO_MATCH = "We could not match an active pass with that ID number.";
+const NO_MATCH = "We could not match an active pass with that code.";
 
 /**
  * Public self check-in: a visitor scans the posted office QR, then enters their
- * pass code and the ID number they presented. Pass + ID number together are the
- * two factors. Returns only their first name and the resulting status.
+ * pass code. Returns only their first name and the resulting status.
  */
 export async function POST(req: NextRequest) {
   return withApiHandler(req, async ({ requestId, ip }) => {
@@ -28,7 +27,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return jsonError(400, parsed.error.issues[0]?.message ?? "Invalid request.", requestId);
     }
-    const { qr, idNumber } = parsed.data;
+    const { qr } = parsed.data;
 
     const ipLimit = await rateLimit(`checkin:ip:${ip ?? "unknown"}`, LIMITS.checkinPerIp(), WINDOWS.short);
     const qrLimit = await rateLimit(`checkin:qr:${qr}`, LIMITS.lookupPerQr(), WINDOWS.short);
@@ -44,15 +43,12 @@ export async function POST(req: NextRequest) {
         status: true,
         qrExpiresAt: true,
         qrRevokedAt: true,
-        visitor: { select: { firstName: true, idNumber: true } },
+        visitor: { select: { firstName: true } },
         department: { select: { name: true } },
       },
     });
 
-    const idMatches =
-      visit?.visitor.idNumber?.trim().toLowerCase() === idNumber.toLowerCase();
-
-    if (!visit || !idMatches) {
+    if (!visit) {
       await recordAudit({
         action: "SELF_CHECKIN",
         result: "FAILURE",
