@@ -33,30 +33,32 @@ export default async function DepartmentsPage() {
           <EmptyState title="No departments" hint="Add a department to get started." />
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
           {departments.map((d) => (
-            <Card key={d.id} className="flex flex-col">
-              <div className="flex-1 p-5">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-sm font-bold">{d.name}</h3>
-                    {d.building && (
-                      <p className="mt-0.5 text-xs text-[var(--muted)]">{d.building}</p>
-                    )}
+            <Card key={d.id} className="flex aspect-square flex-col overflow-hidden">
+              <div className="flex flex-1 flex-col justify-between gap-3 p-4">
+                <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <h3 className="truncate text-sm font-bold">{d.name}</h3>
+                      {d.building && (
+                        <p className="mt-0.5 truncate text-xs text-[var(--muted)]">{d.building}</p>
+                      )}
+                    </div>
+                    <Badge tone={d.isActive ? "green" : "gray"}>
+                      {d.isActive ? "Active" : "Inactive"}
+                    </Badge>
                   </div>
-                  <Badge tone={d.isActive ? "green" : "gray"}>
-                    {d.isActive ? "Active" : "Inactive"}
-                  </Badge>
+
+                  {(d.contactPerson || d.contactEmail) && (
+                    <div className="mt-3 space-y-1 text-xs text-[var(--muted)]">
+                      {d.contactPerson && <p className="truncate">Contact: {d.contactPerson}</p>}
+                      {d.contactEmail && <p className="truncate">Email: {d.contactEmail}</p>}
+                    </div>
+                  )}
                 </div>
 
-                {(d.contactPerson || d.contactEmail) && (
-                  <div className="mt-3 space-y-1 text-xs text-[var(--muted)]">
-                    {d.contactPerson && <p>Contact: {d.contactPerson}</p>}
-                    {d.contactEmail && <p>Email: {d.contactEmail}</p>}
-                  </div>
-                )}
-
-                <div className="mt-3 flex gap-3 text-xs text-[var(--muted)]">
+                <div className="flex gap-3 text-xs text-[var(--muted)]">
                   <span>{d._count.visits} visit(s)</span>
                   <span>{d._count.visitStops} stop(s)</span>
                 </div>
