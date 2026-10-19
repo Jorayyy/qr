@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useState, useTransition } from "react";
-import { Card, CardHeader, Input, Button, Badge, Select } from "@/components/ui";
+import { Card, CardHeader, Input, Button, Badge, Select, buttonClass } from "@/components/ui";
 import { checkInAction, checkOutAction, addVisitStopAction, checkOutStopAction } from "@/lib/actions/visitors";
-import { QrCode, Search, CheckCircle, XCircle, LogIn, LogOut, Camera, X, Keyboard, MapPin, Plus } from "lucide-react";
+import { QrCode, Search, CheckCircle, XCircle, LogIn, LogOut, Camera, X, Keyboard, MapPin, Plus, Upload } from "lucide-react";
 import { CameraViewport, type CameraState } from "@/components/camera-viewport";
 
 type VisitStopInfo = {
@@ -49,12 +49,46 @@ const STATUS_BADGE: Record<string, { tone: "brand" | "green" | "red" | "gray" }>
   CANCELLED: { tone: "red" },
 };
 
+type Decoder = (data: Uint8ClampedArray, width: number, height: number) => { data?: string } | null;
+
+/** Decodes a QR code out of an uploaded image file (screenshot, photo, download). */
+async function decodeQrFromImage(file: File): Promise<string | null> {
+  const mod = await import("jsqr");
+  const jsQr = (((mod as { default?: unknown }).default ?? mod) as unknown) as Decoder;
+  if (typeof jsQr !== "function") return null;
+
+  const url = URL.createObjectURL(file);
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Could not load image"));
+      img.src = url;
+    });
+
+    const scale = Math.min(1, 1200 / Math.max(image.width, image.height));
+    const width = Math.max(1, Math.round(image.width * scale));
+    const height = Math.max(1, Math.round(image.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return null;
+    ctx.drawImage(image, 0, 0, width, height);
+    const frame = ctx.getImageData(0, 0, width, height);
+    return jsQr(frame.data, frame.width, frame.height)?.data?.trim() || null;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 export default function ScannerPage() {
-  const [mode, setMode] = useState<"camera" | "manual">("camera");
+  const [mode, setMode] = useState<"camera" | "manual" | "upload">("camera");
   const [qrInput, setQrInput] = useState("");
   const [result, setResult] = useState<VisitResult | null>(null);
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [cameraOn, setCameraOn] = useState(true);
   const [cameraState, setCameraState] = useState<CameraState>("idle");
@@ -88,6 +122,26 @@ export default function ScannerPage() {
       return;
     }
     lookupVisit(qrInput.trim());
+  }
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setError("");
+    setUploading(true);
+    try {
+      const code = await decodeQrFromImage(file);
+      if (!code) {
+        setError("No QR code found in that image. Try a clearer screenshot or photo.");
+        return;
+      }
+      await lookupVisit(code);
+    } catch {
+      setError("Could not read that image file.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function handleCheckIn() {
@@ -152,11 +206,11 @@ export default function ScannerPage() {
       <div>
         <h1 className="text-xl font-bold tracking-tight">QR Code Scanner</h1>
         <p className="mt-1 text-sm text-[var(--muted)]">
-          Scan a visitor&apos;s QR code using the camera, or enter it manually.
+          Scan a visitor&apos;s QR code with the camera, upload a screenshot, or enter it manually.
         </p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button
           variant={mode === "camera" ? "primary" : "secondary"}
           onClick={() => {
@@ -169,6 +223,19 @@ export default function ScannerPage() {
         >
           <Camera className="h-4 w-4" />
           Camera Scan
+        </Button>
+        <Button
+          variant={mode === "upload" ? "primary" : "secondary"}
+          onClick={() => {
+            setMode("upload");
+            setCameraOn(false);
+            setError("");
+            setResult(null);
+            setFeedback("");
+          }}
+        >
+          <Upload className="h-4 w-4" />
+          Upload QR
         </Button>
         <Button
           variant={mode === "manual" ? "primary" : "secondary"}
@@ -216,6 +283,33 @@ export default function ScannerPage() {
                 Start Camera
               </Button>
             )}
+          </div>
+        </Card>
+      )}
+
+      {mode === "upload" && !result && (
+        <Card>
+          <CardHeader title="Upload QR" subtitle="Pick a screenshot or photo of the visitor's QR code" />
+          <div className="space-y-3 p-5">
+            <label
+              className={buttonClass(
+                "secondary",
+                `w-full cursor-pointer ${uploading ? "pointer-events-none opacity-50" : ""}`
+              )}
+            >
+              <Upload className="h-4 w-4" />
+              {uploading ? "Reading image…" : "Choose image"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleUpload}
+                disabled={uploading}
+              />
+            </label>
+            <p className="text-xs text-[var(--muted)]">
+              Works with the QR image downloaded from a visitor&apos;s profile, a screenshot, or a photo of a printed pass.
+            </p>
           </div>
         </Card>
       )}
