@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import QRCode from "qrcode";
 import { db } from "@/lib/db";
 import { getRequestContext, requirePermission } from "@/lib/auth";
 import { recordAudit } from "@/lib/audit";
@@ -48,6 +49,19 @@ const STATUS_BADGE: Record<string, { tone: "brand" | "green" | "red" | "gray" }>
   CANCELLED: { tone: "red" },
 };
 
+/** Label for why a pass is no longer valid, or null while it is still usable. */
+function invalidationLabel(v: {
+  status: string;
+  qrExpiresAt: Date | null;
+  qrRevokedAt: Date | null;
+}): string | null {
+  if (v.qrRevokedAt) return "Revoked";
+  if (v.status === "CANCELLED") return "Cancelled";
+  if (v.status === "CHECKED_OUT") return "Used";
+  if (v.qrExpiresAt && v.qrExpiresAt.getTime() < Date.now()) return "Expired";
+  return null;
+}
+
 export default async function VisitorDetailPage({
   params,
 }: {
@@ -70,6 +84,25 @@ export default async function VisitorDetailPage({
   });
 
   if (!visitor) notFound();
+
+  const qrImages = new Map(
+    await Promise.all(
+      visitor.visits.map(
+        async (v) =>
+          [
+            v.id,
+            {
+              image: await QRCode.toDataURL(v.qrCode, {
+                width: 200,
+                margin: 1,
+                color: { dark: "#1e293b", light: "#ffffff" },
+              }),
+              inactive: invalidationLabel(v),
+            },
+          ] as const
+      )
+    )
+  );
 
   // Audit access to a visitor's personal record (PII).
   const ctx = await getRequestContext();
@@ -164,7 +197,9 @@ export default async function VisitorDetailPage({
             <EmptyState title="No visits yet" hint="This visitor has no recorded visits." />
           ) : (
             <div className="divide-y divide-[var(--border)]">
-              {visitor.visits.map((v) => (
+              {visitor.visits.map((v) => {
+                const qr = qrImages.get(v.id);
+                return (
                 <div key={v.id} className="p-5">
                   {/* Header row: date, dept, purpose, status */}
                   <div className="flex flex-wrap items-center gap-4 text-sm">
@@ -208,9 +243,25 @@ export default async function VisitorDetailPage({
                   )}
 
                   {/* QR code reference */}
-                  <div className="mt-2 flex items-center gap-1 text-xs text-[var(--muted)]">
-                    <QrCode className="h-3 w-3" />
-                    <span className="font-mono">{v.qrCode}</span>
+                  <div className="mt-3 flex items-center gap-3">
+                    <div className="relative">
+                      <img
+                        src={qr?.image}
+                        alt={`QR code ${v.qrCode}`}
+                        className={`h-20 w-20 rounded-lg border border-[var(--border)] bg-white p-1 ${
+                          qr?.inactive ? "opacity-40" : ""
+                        }`}
+                      />
+                      {qr?.inactive && (
+                        <span className="absolute inset-0 flex items-center justify-center rounded-lg bg-white/60 text-[10px] font-bold uppercase tracking-wide text-slate-600">
+                          {qr.inactive}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-[var(--muted)]">
+                      <QrCode className="h-3 w-3" />
+                      <span className="font-mono">{v.qrCode}</span>
+                    </div>
                   </div>
 
                   {/* Admin-controlled entry/exit (works without scanning) */}
@@ -250,7 +301,8 @@ export default async function VisitorDetailPage({
                     </div>
                   )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </Card>
