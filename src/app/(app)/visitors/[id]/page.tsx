@@ -4,7 +4,7 @@ import QRCode from "qrcode";
 import { db } from "@/lib/db";
 import { getRequestContext, requirePermission } from "@/lib/auth";
 import { recordAudit } from "@/lib/audit";
-import { Card, CardHeader, Badge, EmptyState, PageHeader } from "@/components/ui";
+import { Card, CardHeader, Badge, EmptyState, PageHeader, buttonClass } from "@/components/ui";
 import { VisitControls } from "../actions-client";
 import {
   Mail,
@@ -16,6 +16,7 @@ import {
   Car,
   QrCode,
   Clock,
+  Download,
 } from "lucide-react";
 
 function formatDate(d: Date | null) {
@@ -258,9 +259,21 @@ export default async function VisitorDetailPage({
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-[var(--muted)]">
-                      <QrCode className="h-3 w-3" />
-                      <span className="font-mono">{v.qrCode}</span>
+                    <div className="flex min-w-0 flex-col items-start gap-2">
+                      <div className="flex items-center gap-1 text-xs text-[var(--muted)]">
+                        <QrCode className="h-3 w-3 shrink-0" />
+                        <span className="font-mono break-all">{v.qrCode}</span>
+                      </div>
+                      {!qr?.inactive && (
+                        <a
+                          href={qr?.image}
+                          download={`QR-${visitor.firstName}-${visitor.lastName}-${v.qrCode}.png`}
+                          className={buttonClass("secondary", "min-h-0 w-fit px-2.5 py-1 text-xs")}
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          Download QR
+                        </a>
+                      )}
                     </div>
                   </div>
 
