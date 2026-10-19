@@ -1,4 +1,4 @@
-import { Card, CardHeader, EmptyState, Metric, cx } from "@/components/ui";
+import { Card, CardHeader, EmptyState, Metric } from "@/components/ui";
 import type { BreakdownRow, ReportData, TrendPoint } from "@/lib/report-data";
 
 function TrendChart({ points }: { points: TrendPoint[] }) {
@@ -6,7 +6,7 @@ function TrendChart({ points }: { points: TrendPoint[] }) {
   const labelEvery = points.length <= 12 ? 1 : Math.ceil(points.length / 12);
   return (
     <div>
-      <div className="flex h-44 items-end gap-1">
+      <div className="flex h-40 items-end gap-1">
         {points.map((p) => {
           const height = p.count ? `${Math.max(Math.round((p.count / max) * 100), 4)}%` : "2px";
           return (
@@ -14,10 +14,11 @@ function TrendChart({ points }: { points: TrendPoint[] }) {
               <div
                 style={{ height }}
                 title={`${p.label} — ${p.count} registration${p.count === 1 ? "" : "s"}`}
-                className={cx(
-                  "relative w-full rounded-t-sm transition-colors",
-                  p.count ? "bg-[var(--brand)]/80 group-hover:bg-[var(--brand)]" : "bg-slate-200"
-                )}
+                className={
+                  p.count
+                    ? "relative w-full rounded-t-sm bg-[var(--brand)]/80 transition-colors group-hover:bg-[var(--brand)]"
+                    : "w-full rounded-t-sm bg-slate-200"
+                }
               >
                 {p.count > 0 && (
                   <span className="pointer-events-none absolute -top-6 left-1/2 hidden -translate-x-1/2 rounded bg-slate-900 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-white group-hover:block">
@@ -40,31 +41,41 @@ function TrendChart({ points }: { points: TrendPoint[] }) {
   );
 }
 
-function BreakdownCard({ title, subtitle, rows }: { title: string; subtitle: string; rows: BreakdownRow[] }) {
+function BreakdownColumn({ title, rows }: { title: string; rows: BreakdownRow[] }) {
   return (
-    <Card>
-      <CardHeader title={title} subtitle={subtitle} />
+    <div>
+      <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
+        {title}
+      </p>
       {rows.length === 0 ? (
-        <EmptyState title="No data" hint="Nothing was recorded in this period." />
+        <p className="text-xs text-[var(--muted)]">No data</p>
       ) : (
-        <div className="divide-y divide-[var(--border)]">
+        <div className="space-y-2.5">
           {rows.map((r) => (
-            <div key={r.name} className="px-5 py-3.5">
-              <div className="flex items-center justify-between gap-3 text-sm">
+            <div key={r.name}>
+              <div className="flex items-center justify-between gap-2 text-xs">
                 <span className="truncate font-medium">{r.name}</span>
-                <span className="shrink-0 tabular-nums">
-                  <span className="font-semibold">{r.count}</span>
-                  <span className="ml-2 text-xs text-[var(--muted)]">{r.percent}%</span>
+                <span className="shrink-0 tabular-nums text-[var(--muted)]">
+                  {r.count} · {r.percent}%
                 </span>
               </div>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
+              <div className="mt-1 h-1 overflow-hidden rounded-full bg-slate-100">
                 <div className="h-full rounded-full bg-[var(--brand)]" style={{ width: `${r.percent}%` }} />
               </div>
             </div>
           ))}
         </div>
       )}
-    </Card>
+    </div>
+  );
+}
+
+function Kpi({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <span className="flex items-baseline gap-1.5">
+      <span className="tabular-nums font-semibold text-[var(--foreground)]">{children}</span>
+      {label}
+    </span>
   );
 }
 
@@ -82,18 +93,12 @@ export function ReportView({ data }: { data: ReportData }) {
         </div>
       </Card>
 
-      <Card className="overflow-hidden">
-        <div className="flex flex-col divide-y divide-[var(--border)] sm:flex-row sm:divide-x sm:divide-y-0">
-          <Metric label="Inside now" value={kpis.inside} hint="currently on site" />
-          <Metric label="Avg visit duration" value={kpis.avgDuration} hint="checked-out visits" />
-          <Metric label="Peak" value={kpis.peakLabel ?? "—"} hint="busiest time this period" />
-          <Metric
-            label="Unique visitors"
-            value={kpis.unique}
-            hint={`${newVisitors} new · ${kpis.returning} returning`}
-          />
-        </div>
-      </Card>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 px-1 text-xs text-[var(--muted)]">
+        <Kpi label="inside now">{kpis.inside}</Kpi>
+        <Kpi label="avg duration">{kpis.avgDuration}</Kpi>
+        <Kpi label="peak">{kpis.peakLabel ?? "—"}</Kpi>
+        <Kpi label={`unique (${newVisitors} new · ${kpis.returning} returning)`}>{kpis.unique}</Kpi>
+      </div>
 
       <Card>
         <CardHeader title="Visits over time" subtitle={trend.caption} />
@@ -106,13 +111,14 @@ export function ReportView({ data }: { data: ReportData }) {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
-        <BreakdownCard title="By department" subtitle="Share of registrations" rows={data.byDepartment} />
-        <div className="space-y-4">
-          <BreakdownCard title="By purpose" subtitle="Share of registrations" rows={data.byPurpose} />
-          <BreakdownCard title="By status" subtitle="Share of registrations" rows={data.byStatus} />
+      <Card>
+        <CardHeader title="Breakdown" subtitle="Share of registrations" />
+        <div className="grid grid-cols-1 gap-6 p-5 sm:grid-cols-3">
+          <BreakdownColumn title="By department" rows={data.byDepartment} />
+          <BreakdownColumn title="By purpose" rows={data.byPurpose} />
+          <BreakdownColumn title="By status" rows={data.byStatus} />
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
