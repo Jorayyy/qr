@@ -2,7 +2,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { safeCallbackUrl } from "@/lib/validation";
-import { SITE } from "@/lib/site-info";
 import { ArrowLeft } from "lucide-react";
 import { LoginForm } from "./login-form";
 
@@ -19,16 +18,13 @@ export default async function LoginPage({
 
   return (
     <>
-      <div className="mb-8 text-center">
-        <img src="/logo.png" alt={`${SITE.shortName} logo`} className="mx-auto mb-4 h-14 w-14 object-contain" />
-        <h1 className="font-display text-lg font-bold uppercase tracking-tight text-[var(--brand)]">
-          {SITE.university}
-        </h1>
-        <p className="mt-1 text-sm text-[var(--muted)]">Visitor Management System</p>
-      </div>
-
       <div className="rounded-2xl border border-[var(--border)] bg-white p-6 shadow-xl">
-        <h2 className="mb-4 text-sm font-bold tracking-tight">Sign in to your account</h2>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--brand)]">
+          Staff sign in
+        </h1>
+        <p className="mb-5 mt-1 text-sm text-[var(--muted)]">
+          Visitor Management System
+        </p>
         <LoginForm callbackUrl={safeCallback ?? undefined} />
       </div>
 
