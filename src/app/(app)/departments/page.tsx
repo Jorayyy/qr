@@ -41,9 +41,19 @@ export default async function DepartmentsPage() {
             >
               <div
                 aria-hidden
-                className="pointer-events-none absolute -bottom-6 -right-6 flex h-40 w-40 items-center justify-center rounded-3xl bg-[var(--brand)] transition-colors group-hover:bg-[var(--brand-strong)]"
+                className="pointer-events-none absolute -bottom-6 -right-6 h-40 w-40 overflow-hidden rounded-3xl bg-[var(--brand)]"
               >
-                <Landmark strokeWidth={1.5} className="h-20 w-20 text-white" />
+                {d.photoPath ? (
+                  <img
+                    src={`/api/department-photo?path=${encodeURIComponent(d.photoPath)}`}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center transition-colors group-hover:bg-[var(--brand-strong)]">
+                    <Landmark strokeWidth={1.5} className="h-20 w-20 text-white" />
+                  </div>
+                )}
               </div>
 
               <div className="relative flex flex-1 flex-col justify-between gap-3 p-4">

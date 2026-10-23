@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Card, CardHeader, Input, Button } from "@/components/ui";
+import { DepartmentPhotoField } from "@/components/department-photo-field";
 import { updateDepartmentAction, type DepartmentActionState } from "@/lib/actions/departments";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
@@ -12,6 +13,7 @@ type Department = {
   building: string | null;
   contactPerson: string | null;
   contactEmail: string | null;
+  photoPath: string | null;
 };
 
 export default function EditDepartmentForm({ department }: { department: Department }) {
@@ -69,6 +71,8 @@ export default function EditDepartmentForm({ department }: { department: Departm
             <label className="label">Building (Optional)</label>
             <Input name="building" defaultValue={department.building ?? ""} />
           </div>
+
+          <DepartmentPhotoField initialPath={department.photoPath} />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>

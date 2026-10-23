@@ -48,6 +48,7 @@ function readDepartmentForm(formData: FormData) {
     building: formString(formData, "building"),
     contactPerson: formString(formData, "contactPerson"),
     contactEmail: formString(formData, "contactEmail"),
+    photoPath: formString(formData, "photoPath"),
   });
 }
 
@@ -72,7 +73,9 @@ export async function createDepartmentAction(
       return { success: false, message: "A department with this name already exists." };
     }
 
-    const department = await db.department.create({ data: parsed.data });
+    const department = await db.department.create({
+      data: { ...parsed.data, photoPath: parsed.data.photoPath ?? null },
+    });
 
     await recordAudit({
       actorId: auth.user.userId,
@@ -88,6 +91,7 @@ export async function createDepartmentAction(
     });
 
     revalidatePath("/departments");
+    revalidatePath("/");
     return { success: true, message: "Department created successfully." };
   } catch (error) {
     console.error(
@@ -132,7 +136,10 @@ export async function updateDepartmentAction(
       return { success: false, message: "A department with this name already exists." };
     }
 
-    await db.department.update({ where: { id: departmentId.data }, data: parsed.data });
+    await db.department.update({
+      where: { id: departmentId.data },
+      data: { ...parsed.data, photoPath: parsed.data.photoPath ?? null },
+    });
 
     await recordAudit({
       actorId: auth.user.userId,
@@ -148,6 +155,7 @@ export async function updateDepartmentAction(
     });
 
     revalidatePath("/departments");
+    revalidatePath("/");
     revalidatePath(`/departments/${departmentId.data}/edit`);
     return { success: true, message: "Department updated successfully." };
   } catch (error) {
@@ -196,6 +204,7 @@ export async function toggleDepartmentAction(id: string): Promise<DepartmentActi
     });
 
     revalidatePath("/departments");
+    revalidatePath("/");
     return {
       success: true,
       message: dept.isActive ? "Department deactivated." : "Department activated.",
@@ -252,6 +261,7 @@ export async function deleteDepartmentAction(id: string): Promise<DepartmentActi
     });
 
     revalidatePath("/departments");
+    revalidatePath("/");
     return { success: true, message: "Department deleted." };
   } catch (error) {
     console.error(

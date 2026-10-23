@@ -129,6 +129,7 @@ model Department {
   building      String?
   contactPerson String?
   contactEmail  String?
+  photoPath     String?
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

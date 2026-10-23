@@ -56,7 +56,7 @@ export default async function Home() {
     where: { isActive: true },
     orderBy: { name: "asc" },
     take: 6,
-    select: { id: true, name: true, building: true },
+    select: { id: true, name: true, building: true, photoPath: true },
   });
 
   return (
@@ -191,7 +191,11 @@ export default async function Home() {
                     <div
                       aria-hidden
                       className="absolute inset-0 bg-cover bg-center"
-                      style={{ backgroundImage: `url('/departments/${slugify(d.name)}.jpg')` }}
+                      style={{
+                        backgroundImage: d.photoPath
+                          ? `url('/api/department-photo?path=${encodeURIComponent(d.photoPath)}')`
+                          : `url('/departments/${slugify(d.name)}.jpg')`,
+                      }}
                     />
                     <Landmark
                       aria-hidden

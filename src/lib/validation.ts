@@ -31,6 +31,18 @@ const optionalPhotoPath = z
     "Invalid photo reference."
   );
 
+/** Department photos live in their own Blob prefix and are served publicly. */
+const optionalDepartmentPhotoPath = z
+  .string()
+  .trim()
+  .max(300)
+  .optional()
+  .transform((value) => (value === "" ? undefined : value))
+  .refine(
+    (value) => value === undefined || /^departments\/[A-Za-z0-9._-]+$/.test(value),
+    "Invalid photo reference."
+  );
+
 export const emailField = z
   .string()
   .trim()
@@ -87,6 +99,7 @@ export const departmentSchema = z
     building: optionalText(120),
     contactPerson: optionalText(120),
     contactEmail: optionalText(254),
+    photoPath: optionalDepartmentPhotoPath,
   })
   .strict();
 

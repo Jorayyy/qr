@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Card, CardHeader, Input, Button } from "@/components/ui";
+import { DepartmentPhotoField } from "@/components/department-photo-field";
 import { createDepartmentAction, type DepartmentActionState } from "@/lib/actions/departments";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
@@ -63,6 +64,8 @@ export default function NewDepartmentPage() {
             <label className="label">Building (Optional)</label>
             <Input name="building" placeholder="e.g. Tech Building" />
           </div>
+
+          <DepartmentPhotoField />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
