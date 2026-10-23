@@ -7,15 +7,27 @@
 export const SITE = {
   university: "Eastern Visayas State University",
   shortName: "EVSU",
+  motto: "Knowledge · Service · Excellence",
   address: "Archbishop Lino R. Gonzaga Avenue, Tacloban City, Philippines 6500",
   contactPhone: "+63 53 888 2565",
   contactEmail: "info@evsu.edu.ph",
+  campusMap: "/campus-map.jpg",
   officeHours: [
     { days: "Monday – Friday", hours: "7:00 AM – 6:00 PM" },
     { days: "Saturday", hours: "8:00 AM – 12:00 NN" },
     { days: "Sunday & holidays", hours: "Closed" },
   ],
 } as const;
+
+export const ABOUT =
+  "Eastern Visayas State University (EVSU) is a leading public university in the region, offering quality education and extension services. With a strong commitment to service and excellence, EVSU continues to empower students and communities for a better future.";
+
+export const QUICK_LINKS = [
+  { label: "University Website", href: "https://evsu.edu.ph" },
+  { label: "Campus Map", href: "#map" },
+  { label: "Visitor Guidelines", href: "#guidelines" },
+  { label: "Contact Us", href: "#contact" },
+] as const;
 
 export const ENTRY_STEPS = [
   {

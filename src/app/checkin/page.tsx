@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { buttonClass } from "@/components/ui";
 import { PublicShell } from "@/components/public-shell";
 import { SITE } from "@/lib/site-info";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ScanLine } from "lucide-react";
 import CheckinForm from "./checkin-form";
 
 export const metadata = {
@@ -12,19 +11,16 @@ export const metadata = {
 
 export default function CheckinPage() {
   return (
-    <PublicShell
-      right={
-        <Link href="/" className={buttonClass("secondary", "shrink-0")}>
-          <ArrowLeft className="h-4 w-4" />
-          Home
-        </Link>
-      }
-    >
-      <div className="mx-auto max-w-md">
-        <h1 className="text-2xl font-extrabold tracking-tight text-white">Check in or out</h1>
-        <p className="mt-2 text-sm leading-relaxed text-white/80">
-          Scan your pass or type the pass code, then enter the ID number you
-          presented at the Front Desk. Staff can help if you need assistance.
+    <PublicShell>
+      <div className="mx-auto w-full max-w-md px-4 py-12 sm:px-6">
+        <span className="inline-flex items-center gap-2 rounded-full bg-[var(--brand-soft)] px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--brand)]">
+          <ScanLine className="h-4 w-4" />
+          Self check-in
+        </span>
+        <h1 className="mt-3 text-2xl font-extrabold tracking-tight">Check in or out</h1>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
+          Scan your pass or type the pass code, then enter the ID number you presented at the
+          Front Desk. Staff can help if you need assistance.
         </p>
 
         <div className="mt-6">
@@ -34,8 +30,9 @@ export default function CheckinPage() {
         <div className="mt-6 text-center">
           <Link
             href="/"
-            className="text-sm font-semibold text-white/80 underline-offset-2 hover:text-white hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--brand)] underline-offset-2 hover:underline"
           >
+            <ArrowLeft className="h-4 w-4" />
             New visitor? See how to enter
           </Link>
         </div>
