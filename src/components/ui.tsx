@@ -128,7 +128,6 @@ export function PageHeader({
       <div className="flex min-w-0 items-center gap-4">
         {leading}
         <div className="min-w-0">
-          <span aria-hidden className="mb-2 block h-0.5 w-10 rounded-full bg-[var(--accent)]" />
           <h1 className="font-display text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl">{title}</h1>
           {subtitle ? <p className="mt-1.5 text-sm text-[var(--muted)]">{subtitle}</p> : null}
         </div>

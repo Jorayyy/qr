@@ -80,13 +80,13 @@ export async function DashboardOverview() {
   const yesterday = manilaMidnight(nowParts.year, nowParts.month, nowParts.day - 1);
   const tomorrow = manilaMidnight(nowParts.year, nowParts.month, nowParts.day + 1);
 
-  const [totalToday, yesterdayTotal, checkedIn, checkedOut, pending, todaysVisits, openStops, recentVisits] =
+  const [totalToday, yesterdayTotal, enteredToday, exitedToday, pending, todaysVisits, openStops, recentVisits] =
     await Promise.all([
       db.visit.count({ where: { createdAt: { gte: today } } }),
       db.visit.count({ where: { createdAt: { gte: yesterday, lt: today } } }),
-      db.visit.count({ where: { status: "CHECKED_IN" } }),
-      db.visit.count({ where: { status: "CHECKED_OUT" } }),
-      db.visit.count({ where: { status: "PENDING", createdAt: { gte: today } } }),
+      db.visit.count({ where: { actualArrival: { gte: today, lt: tomorrow } } }),
+      db.visit.count({ where: { actualDeparture: { gte: today, lt: tomorrow } } }),
+      db.visit.count({ where: { status: "PENDING" } }),
       db.visit.findMany({
         where: { createdAt: { gte: today, lt: tomorrow } },
         select: { actualArrival: true, createdAt: true },
@@ -134,10 +134,10 @@ export async function DashboardOverview() {
     <>
       <Card className="mb-6 overflow-hidden">
         <div className="flex flex-col divide-y divide-[var(--border)] sm:flex-row sm:divide-x sm:divide-y-0">
-          <Metric label="Registered today" value={totalToday} delta={delta} hint="vs yesterday" />
-          <Metric label="Inside now" value={checkedIn} hint="awaiting checkout" />
-          <Metric label="Exited" value={checkedOut} hint="all time" />
-          <Metric label="Awaiting arrival" value={pending} hint="not yet scanned in" />
+          <Metric label="Expected today" value={totalToday} delta={delta} hint="registered passes" />
+          <Metric label="Entered" value={enteredToday} hint="checked in today" />
+          <Metric label="Exited" value={exitedToday} hint="checked out today" />
+          <Metric label="Waiting" value={pending} hint="passes not yet scanned in" />
         </div>
       </Card>
 

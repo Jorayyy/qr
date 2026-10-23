@@ -53,9 +53,6 @@ function NavLink({
           : "text-slate-600 hover:bg-slate-50 hover:text-[var(--brand)]"
       )}
     >
-      {active ? (
-        <span aria-hidden className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-[var(--accent)]" />
-      ) : null}
       <Icon className={cx("h-4 w-4", active ? "text-[var(--brand)]" : "text-slate-400")} />
       {children ?? item.label}
     </Link>
@@ -74,17 +71,19 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
 
   return (
     <aside className="no-print flex h-full w-60 flex-col border-r border-[var(--border)] bg-white">
-      <div className="bg-[var(--brand)] px-5 py-4">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-0.5">
+      <div className="bg-[var(--brand)] px-4 py-5">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-0.5">
             <img src="/logo.png" alt="EVSU Logo" className="h-full w-full object-contain" />
           </span>
-          <div className="min-w-0">
-            <p className="font-display text-[13px] font-bold leading-tight tracking-tight text-white">
+          <div className="min-w-0 pt-0.5">
+            <p className="font-display text-[15px] font-bold leading-tight tracking-tight text-white">
               Visitor Management
             </p>
-            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
-              Eastern Visayas State University
+            <p className="mt-1.5 text-[9px] font-semibold uppercase leading-[1.6] tracking-[0.14em] text-[var(--accent)]">
+              Eastern Visayas
+              <br />
+              State University
             </p>
           </div>
         </div>
