@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { buttonClass } from "@/components/ui";
@@ -93,10 +93,10 @@ export default function CheckinForm() {
             id="pass-code"
             value={qr}
             onChange={(e) => setQr(e.target.value.toUpperCase())}
-            placeholder="e.g. VMS-3F2Aâ€¦"
+            placeholder="e.g. VMS-3F2A…"
             autoComplete="off"
             required
-            className={`${INPUT} font-mono uppercase`}
+            className={`${INPUT} font-mono`}
           />
           <button
             type="button"
@@ -129,7 +129,7 @@ export default function CheckinForm() {
         disabled={busy}
         className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--brand)] px-3 py-3 text-base font-semibold text-white shadow-lg transition hover:bg-[var(--brand-strong)] disabled:pointer-events-none disabled:opacity-50"
       >
-        {busy ? "Checkingâ€¦" : "Check in / out"}
+        {busy ? "Checking…" : "Check in / out"}
       </button>
     </form>
   );

@@ -1,11 +1,11 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { PublicShell } from "@/components/public-shell";
 import { SITE } from "@/lib/site-info";
 import { ArrowLeft, ScanLine } from "lucide-react";
 import CheckinForm from "./checkin-form";
 
 export const metadata = {
-  title: `Self check-in Â· ${SITE.shortName} Visitor System`,
+  title: `Self check-in · ${SITE.shortName} Visitor System`,
   description: "Check yourself in or out using your visitor pass and ID number.",
 };
 

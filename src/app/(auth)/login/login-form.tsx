@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useActionState, useState } from "react";
 import { loginAction, verifyMfaAction } from "@/lib/actions/auth";
@@ -42,7 +42,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
           disabled={mfaPending}
           className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-[var(--brand)] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[var(--brand-strong)] disabled:pointer-events-none disabled:opacity-50"
         >
-          {mfaPending ? "Verifyingâ€¦" : "Verify"}
+          {mfaPending ? "Verifying…" : "Verify"}
         </button>
 
         <div className="flex items-center justify-between">
@@ -115,7 +115,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            Signing inâ€¦
+            Signing in…
           </>
         ) : (
           "Sign in"
