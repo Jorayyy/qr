@@ -16,12 +16,8 @@ import {
 import {
   ArrowRight,
   ArrowUpRight,
-  BookOpen,
   CheckCircle2,
-  ClipboardList,
-  Clock,
   Landmark,
-  Link2,
   LogIn,
   MapPin,
   QrCode,
@@ -35,7 +31,14 @@ export const metadata: Metadata = {
     "Visitor entry, campus map, departments and visitor guidelines for Eastern Visayas State University.",
 };
 
-const SECTION = "scroll-mt-28 mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:py-16";
+const SECTION = "scroll-mt-28 mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:py-20";
+
+const EYEBROW =
+  "text-[11px] font-bold uppercase tracking-[0.24em] text-[var(--brand)]/55";
+
+const H2 = "mt-2 font-display text-3xl font-bold tracking-tight text-[var(--brand)] sm:text-4xl";
+
+const BAND = "border-y border-[var(--brand)]/10 bg-white";
 
 function slugify(value: string) {
   return value
@@ -68,13 +71,20 @@ export default async function Home() {
           aria-hidden
           className="absolute inset-0 bg-gradient-to-r from-[var(--brand-strong)]/95 via-[var(--brand)]/85 to-[var(--brand-strong)]/55"
         />
+        <div
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 h-px bg-[var(--accent)]/60"
+        />
 
-        <div className="relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:py-20">
+        <div className="relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:py-24">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.28em] text-[var(--accent)]">Welcome to</p>
-            <h1 className="mt-3 text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[var(--accent)]">
+              Welcome to
+            </p>
+            <h1 className="mt-4 font-display text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
               {SITE.university}
             </h1>
+            <div className="mt-5 h-px w-16 bg-[var(--accent)]" />
             <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
               A premier state university in Eastern Visayas, committed to academic excellence,
               innovation, and community development.
@@ -94,11 +104,11 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-2xl sm:p-8">
+          <div className="rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-black/5 sm:p-8">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--brand)]">
               <Users className="h-7 w-7 text-white" />
             </div>
-            <h2 className="mt-4 text-xl font-extrabold tracking-tight text-[var(--brand)]">
+            <h2 className="mt-4 font-display text-2xl font-bold tracking-tight text-[var(--brand)]">
               Visitor Registration
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
@@ -113,25 +123,23 @@ export default async function Home() {
       </section>
 
       <section id="map" className={SECTION}>
-        <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+        <div className="grid gap-10 lg:grid-cols-[0.65fr_1.35fr] lg:items-center">
           <div>
-            <h2 className="flex items-center gap-2.5 text-2xl font-extrabold tracking-tight text-[var(--brand)]">
-              <MapPin className="h-6 w-6" />
-              Campus Map
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
+            <p className={EYEBROW}>Campus</p>
+            <h2 className={H2}>Campus Map</h2>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">
               Find your destination easily. Explore the university buildings, departments, and
               offices — the Main Gate is where visitors enter and register.
             </p>
-            <p className="mt-4 flex items-start gap-2 text-sm text-[var(--foreground)]">
-              <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--brand)] text-[10px] font-bold text-white">
+            <div className="mt-6 flex gap-3 border-t border-[var(--brand)]/10 pt-5">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--brand)] font-display text-xs font-bold text-white">
                 1
               </span>
-              <span>
+              <p className="text-sm leading-relaxed text-[var(--foreground)]">
                 <strong className="font-semibold">Main Gate</strong> — present your ID at the
                 Front Desk to register and receive your QR pass.
-              </span>
-            </p>
+              </p>
+            </div>
             <a
               href={SITE.campusMap}
               target="_blank"
@@ -147,25 +155,23 @@ export default async function Home() {
             <img
               src={SITE.campusMap}
               alt="EVSU campus map showing numbered buildings, roads and the main gate"
-              className="w-full rounded-2xl border border-[var(--border)] bg-white shadow-sm transition group-hover:shadow-md"
+              className="w-full rounded-2xl border border-[var(--brand)]/10 bg-white shadow-sm transition group-hover:shadow-md"
             />
           </a>
         </div>
       </section>
 
-      <div className="border-y border-[var(--border)] bg-white">
+      <div className={BAND}>
         <section id="departments" className={SECTION}>
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 className="flex items-center gap-2.5 text-2xl font-extrabold tracking-tight text-[var(--brand)]">
-                <Landmark className="h-6 w-6" />
-                Our Departments &amp; Offices
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
+              <p className={EYEBROW}>Directory</p>
+              <h2 className={H2}>Our Departments &amp; Offices</h2>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">
                 Explore our colleges, academic departments, and administrative offices.
               </p>
             </div>
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--brand)]/50">
               Ask the Front Desk for directions
             </p>
           </div>
@@ -175,7 +181,7 @@ export default async function Home() {
               The department directory is being updated. Please ask the Front Desk for assistance.
             </p>
           ) : (
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {departments.map((d) => (
                 <article
                   key={d.id}
@@ -198,7 +204,9 @@ export default async function Home() {
                     </span>
                     <h3 className="text-sm font-bold leading-snug tracking-tight">{d.name}</h3>
                     {d.building ? (
-                      <p className="mt-1 text-xs text-[var(--muted)]">{d.building}</p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.08em] text-[var(--muted)]">
+                        {d.building}
+                      </p>
                     ) : null}
                   </div>
                 </article>
@@ -209,35 +217,46 @@ export default async function Home() {
       </div>
 
       <section id="steps" className={SECTION}>
-        <h2 className="flex items-center gap-2.5 text-2xl font-extrabold tracking-tight text-[var(--brand)]">
-          <QrCode className="h-6 w-6" />
-          How to enter
-        </h2>
-        <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-          Five simple steps from the gate to your destination.
-        </p>
-        <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {ENTRY_STEPS.map((step, i) => (
-            <li
-              key={step.title}
-              className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm"
-            >
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--brand-soft)] text-sm font-bold text-[var(--brand)]">
-                {i + 1}
-              </span>
-              <h3 className="mt-3 text-base font-bold tracking-tight">{step.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-[var(--muted)]">{step.body}</p>
-            </li>
-          ))}
-        </ol>
+        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+          <div className="lg:sticky lg:top-32 lg:self-start">
+            <p className={EYEBROW}>Registration</p>
+            <h2 className={H2}>How to enter</h2>
+            <p className="mt-3 max-w-sm text-sm leading-relaxed text-[var(--muted)]">
+              Five simple steps from the gate to your destination — registration happens at the
+              Front Desk, no online form needed.
+            </p>
+            <Link href="/checkin" className={buttonClass("secondary", "mt-6")}>
+              <LogIn className="h-4 w-4" />
+              I already have a pass
+            </Link>
+          </div>
+
+          <div className="relative">
+            <div
+              aria-hidden
+              className="absolute bottom-6 left-5 top-6 w-px bg-[var(--brand)]/15"
+            />
+            <ol className="space-y-9">
+              {ENTRY_STEPS.map((step, i) => (
+                <li key={step.title} className="relative pl-14">
+                  <span className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--brand)]/25 bg-[var(--paper)] font-display text-sm font-bold text-[var(--brand)]">
+                    {i + 1}
+                  </span>
+                  <h3 className="pt-1.5 text-base font-bold tracking-tight">{step.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">{step.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
       </section>
 
-      <div className="border-y border-[var(--border)] bg-white">
+      <div className={BAND}>
         <div className={SECTION}>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <section className="rounded-2xl border border-[var(--border)] p-6">
-              <h2 className="flex items-center gap-2 text-base font-bold tracking-tight text-[var(--brand)]">
-                <BookOpen className="h-5 w-5" />
+          <div className="grid gap-8 lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-[var(--brand)]/10">
+            <section className="lg:pr-8">
+              <p className={EYEBROW}>The University</p>
+              <h2 className="mt-2 font-display text-xl font-bold tracking-tight text-[var(--brand)]">
                 About EVSU
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{ABOUT}</p>
@@ -252,24 +271,24 @@ export default async function Home() {
               </a>
             </section>
 
-            <section id="guidelines" className="scroll-mt-28 rounded-2xl border border-[var(--border)] p-6">
-              <h2 className="flex items-center gap-2 text-base font-bold tracking-tight text-[var(--brand)]">
-                <ClipboardList className="h-5 w-5" />
+            <section id="guidelines" className="scroll-mt-28 lg:px-8">
+              <p className={EYEBROW}>Before you visit</p>
+              <h2 className="mt-2 font-display text-xl font-bold tracking-tight text-[var(--brand)]">
                 Visitor Guidelines
               </h2>
-              <ul className="mt-3 space-y-2">
+              <ul className="mt-3 space-y-2.5">
                 {ENTRY_REQUIREMENTS.map((req) => (
-                  <li key={req} className="flex gap-2 text-sm text-[var(--muted)]">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--brand)]" />
+                  <li key={req} className="flex gap-2.5 text-sm text-[var(--muted)]">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--brand)]/70" />
                     <span>{req}</span>
                   </li>
                 ))}
               </ul>
             </section>
 
-            <section className="rounded-2xl border border-[var(--border)] p-6">
-              <h2 className="flex items-center gap-2 text-base font-bold tracking-tight text-[var(--brand)]">
-                <Link2 className="h-5 w-5" />
+            <section className="lg:px-8">
+              <p className={EYEBROW}>Shortcuts</p>
+              <h2 className="mt-2 font-display text-xl font-bold tracking-tight text-[var(--brand)]">
                 Quick Links
               </h2>
               <ul className="mt-3 space-y-2.5">
@@ -277,7 +296,9 @@ export default async function Home() {
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      {...(link.href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}
+                      {...(link.href.startsWith("http")
+                        ? { target: "_blank", rel: "noreferrer" }
+                        : {})}
                       className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--foreground)] hover:text-[var(--brand)] hover:underline"
                     >
                       {link.label}
@@ -288,56 +309,63 @@ export default async function Home() {
               </ul>
             </section>
 
-            <section className="relative isolate flex min-h-48 items-end overflow-hidden rounded-2xl p-6">
+            <section className="relative isolate flex min-h-52 items-end overflow-hidden rounded-2xl p-6 lg:ml-8">
               <div
                 aria-hidden
                 className="absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: "url('/bg.jpg')" }}
               />
               <div aria-hidden className="absolute inset-0 bg-[var(--brand-strong)]/75" />
-              <blockquote className="relative text-sm italic leading-relaxed text-white">
+              <blockquote className="relative font-display text-base italic leading-relaxed text-white">
                 “Together, we build a brighter future.”
-                <footer className="mt-2 text-xs not-italic text-white/70">— {SITE.university}</footer>
+                <footer className="mt-2 font-sans text-[11px] not-italic uppercase tracking-[0.14em] text-white/70">
+                  {SITE.university}
+                </footer>
               </blockquote>
-            </section>
-          </div>
-
-          <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <section className="rounded-2xl border border-[var(--border)] p-6">
-              <h2 className="flex items-center gap-2 text-base font-bold tracking-tight text-[var(--brand)]">
-                <Clock className="h-5 w-5" />
-                Office hours
-              </h2>
-              <ul className="mt-3 space-y-2">
-                {SITE.officeHours.map((h) => (
-                  <li key={h.days} className="flex items-center justify-between gap-3 text-sm">
-                    <span className="text-[var(--muted)]">{h.days}</span>
-                    <span className="font-semibold tabular-nums">{h.hours}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            <section className="rounded-2xl border border-[var(--border)] p-6">
-              <h2 className="flex items-center gap-2 text-base font-bold tracking-tight text-[var(--brand)]">
-                <ShieldCheck className="h-5 w-5" />
-                Privacy notice
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{PRIVACY_NOTICE}</p>
             </section>
           </div>
         </div>
       </div>
 
       <section className={SECTION}>
-        <div className="flex flex-col items-center gap-4 rounded-2xl bg-[var(--brand)] px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
+        <div className="grid gap-10 md:grid-cols-2 md:gap-0 md:divide-x md:divide-[var(--brand)]/10">
+          <section className="md:pr-10">
+            <p className={EYEBROW}>Front Desk</p>
+            <h2 className="mt-2 font-display text-xl font-bold tracking-tight text-[var(--brand)]">
+              Office hours
+            </h2>
+            <ul className="mt-4 space-y-2.5">
+              {SITE.officeHours.map((h) => (
+                <li
+                  key={h.days}
+                  className="flex items-center justify-between gap-3 border-b border-[var(--brand)]/10 pb-2.5 text-sm last:border-0"
+                >
+                  <span className="text-[var(--muted)]">{h.days}</span>
+                  <span className="font-semibold tabular-nums">{h.hours}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="md:pl-10">
+            <h2 className="flex items-center gap-2 font-display text-xl font-bold tracking-tight text-[var(--brand)]">
+              <ShieldCheck className="h-5 w-5" />
+              Privacy notice
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{PRIVACY_NOTICE}</p>
+          </section>
+        </div>
+
+        <div className="mt-12 flex flex-col items-center gap-4 border-t border-[var(--brand)]/10 pt-8 text-center sm:flex-row sm:justify-between sm:text-left">
           <div>
-            <h2 className="text-lg font-extrabold tracking-tight text-white">Ready to check in?</h2>
-            <p className="mt-1 text-sm text-white/80">
+            <h2 className="font-display text-xl font-bold tracking-tight text-[var(--brand)]">
+              Ready to check in?
+            </h2>
+            <p className="mt-1 text-sm text-[var(--muted)]">
               Scan your pass at the entrance, or self check-in with your pass code.
             </p>
           </div>
-          <Link href="/checkin" className={`${ACCENT_BUTTON} shrink-0`}>
+          <Link href="/checkin" className={buttonClass("primary", "shrink-0")}>
             <LogIn className="h-4 w-4" />
             Check in / out
           </Link>

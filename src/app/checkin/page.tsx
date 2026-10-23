@@ -1,11 +1,11 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { PublicShell } from "@/components/public-shell";
 import { SITE } from "@/lib/site-info";
 import { ArrowLeft, ScanLine } from "lucide-react";
 import CheckinForm from "./checkin-form";
 
 export const metadata = {
-  title: `Self check-in · ${SITE.shortName} Visitor System`,
+  title: `Self check-in Â· ${SITE.shortName} Visitor System`,
   description: "Check yourself in or out using your visitor pass and ID number.",
 };
 
@@ -17,7 +17,7 @@ export default function CheckinPage() {
           <ScanLine className="h-4 w-4" />
           Self check-in
         </span>
-        <h1 className="mt-3 text-2xl font-extrabold tracking-tight">Check in or out</h1>
+        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-[var(--brand)]">Check in or out</h1>
         <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
           Scan your pass or type the pass code, then enter the ID number you presented at the
           Front Desk. Staff can help if you need assistance.

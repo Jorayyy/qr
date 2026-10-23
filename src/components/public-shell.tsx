@@ -46,7 +46,7 @@ function NavLinks({ className }: { className?: string }) {
 
 export function PublicShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-[var(--background)]">
+    <div className="flex min-h-[100dvh] flex-col bg-[var(--paper)]">
       <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-white/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Brand />

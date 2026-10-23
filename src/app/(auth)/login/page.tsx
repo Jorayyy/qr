@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { safeCallbackUrl } from "@/lib/validation";
@@ -21,7 +21,7 @@ export default async function LoginPage({
     <>
       <div className="mb-8 text-center">
         <img src="/logo.png" alt={`${SITE.shortName} logo`} className="mx-auto mb-4 h-14 w-14 object-contain" />
-        <h1 className="text-lg font-extrabold uppercase tracking-tight text-[var(--brand)]">
+        <h1 className="font-display text-lg font-bold uppercase tracking-tight text-[var(--brand)]">
           {SITE.university}
         </h1>
         <p className="mt-1 text-sm text-[var(--muted)]">Visitor Management System</p>
