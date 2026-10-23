@@ -4,7 +4,7 @@ import QRCode from "qrcode";
 import { db } from "@/lib/db";
 import { getRequestContext, requirePermission } from "@/lib/auth";
 import { recordAudit } from "@/lib/audit";
-import { Card, CardHeader, Badge, EmptyState, PageHeader, buttonClass } from "@/components/ui";
+import { Card, CardHeader, Badge, EmptyState, PageHeader, Avatar, buttonClass } from "@/components/ui";
 import { VisitControls } from "../actions-client";
 import {
   Mail,
@@ -130,6 +130,20 @@ export default async function VisitorDetailPage({
       <PageHeader
         title={`${visitor.firstName} ${visitor.lastName}`}
         subtitle="Visitor profile and visit history"
+        leading={
+          visitor.photoUrl ? (
+            <img
+              src={`/api/visitor-photo?path=${encodeURIComponent(visitor.photoUrl)}`}
+              alt=""
+              className="h-16 w-16 shrink-0 rounded-2xl border border-[var(--border)] bg-slate-50 object-cover shadow-sm"
+            />
+          ) : (
+            <Avatar
+              name={`${visitor.firstName} ${visitor.lastName}`}
+              className="h-16 w-16 rounded-2xl text-lg"
+            />
+          )
+        }
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

@@ -13,7 +13,7 @@ import {
   UserPlus,
   type LucideIcon,
 } from "lucide-react";
-import { cx, buttonClass } from "@/components/ui";
+import { cx, buttonClass, Avatar } from "@/components/ui";
 import { logoutAction } from "@/lib/actions/auth";
 import { can } from "@/lib/rbac";
 
@@ -32,6 +32,36 @@ const ADMIN_ITEMS: NavItem[] = [
   { href: "/security", label: "Security", icon: ShieldCheck },
 ];
 
+function NavLink({
+  item,
+  active,
+  children,
+}: {
+  item: NavItem;
+  active: boolean;
+  children?: React.ReactNode;
+}) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      aria-current={active ? "page" : undefined}
+      className={cx(
+        "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition",
+        active
+          ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+          : "text-slate-600 hover:bg-slate-50 hover:text-[var(--brand)]"
+      )}
+    >
+      {active ? (
+        <span aria-hidden className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-[var(--accent)]" />
+      ) : null}
+      <Icon className={cx("h-4 w-4", active ? "text-[var(--brand)]" : "text-slate-400")} />
+      {children ?? item.label}
+    </Link>
+  );
+}
+
 type SidebarProps = {
   userName?: string;
   userRole?: string;
@@ -44,95 +74,67 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
 
   return (
     <aside className="no-print flex h-full w-60 flex-col border-r border-[var(--border)] bg-white">
-      <div className="flex h-14 items-center gap-2 border-b border-[var(--border)] px-5">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-[var(--border)]">
-          <img src="/logo.png" alt="EVSU Logo" className="h-full w-full object-contain" />
+      <div className="bg-[var(--brand)] px-5 py-4">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-0.5">
+            <img src="/logo.png" alt="EVSU Logo" className="h-full w-full object-contain" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-display text-[13px] font-bold leading-tight tracking-tight text-white">
+              Visitor Management
+            </p>
+            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+              Eastern Visayas State University
+            </p>
+          </div>
         </div>
-        <span className="text-sm font-bold tracking-tight">Visitor Management</span>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+        <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
+          Workspace
+        </p>
         {NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
-          const isActive =
+          const active =
             pathname.startsWith(item.href) &&
             !(item.exclude ?? []).some((prefix) => pathname.startsWith(prefix));
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cx(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[0.9375rem] font-medium transition",
-                isActive
-                  ? "bg-[var(--brand-soft)] text-[var(--brand)]"
-                  : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              {item.label}
-            </Link>
-          );
+          return <NavLink key={item.href} item={item} active={active} />;
         })}
 
         {mayRegister && (
-          <Link
-            href="/visitors/register"
-            className={cx(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[0.9375rem] font-medium transition",
-              pathname.startsWith("/visitors/register")
-                ? "bg-[var(--brand-soft)] text-[var(--brand)]"
-                : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
-            )}
-          >
-            <UserPlus className="h-4 w-4" />
-            Register Walk-in
-          </Link>
+          <NavLink item={{ href: "/visitors/register", label: "Register Walk-in", icon: UserPlus }} active={pathname.startsWith("/visitors/register")} />
         )}
 
         {isAdmin && (
           <>
-            <div className="my-2 border-t border-[var(--border)]" />
-            <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">
-              Admin
+            <p className="px-3 pb-1 pt-4 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
+              Administration
             </p>
-            {ADMIN_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cx(
-                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[0.9375rem] font-medium transition",
-                    isActive
-                      ? "bg-[var(--brand-soft)] text-[var(--brand)]"
-                      : "text-slate-600 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]"
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
+            {ADMIN_ITEMS.map((item) => (
+              <NavLink key={item.href} item={item} active={pathname.startsWith(item.href)} />
+            ))}
           </>
         )}
       </nav>
 
-      <div className="border-t border-[var(--border)] px-4 py-3">
+      <div className="border-t border-[var(--border)] p-3">
         {userName && (
-          <div className="mb-2">
-            <p className="text-sm font-semibold truncate">{userName}</p>
-            <p className="text-xs text-[var(--muted)] capitalize">{userRole?.toLowerCase()}</p>
+          <div className="mb-2 flex items-center gap-2.5 rounded-lg bg-slate-50 px-2.5 py-2">
+            <Avatar name={userName} />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold leading-tight">{userName}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">
+                {userRole?.toLowerCase()}
+              </p>
+            </div>
           </div>
         )}
-        <div className="space-y-1">
-          <form action={logoutAction}>
-            <button type="submit" className={buttonClass("ghost", "w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700")}>
-              <LogOut className="h-4 w-4" />
-              Logout
-            </button>
-          </form>
-        </div>
+        <form action={logoutAction}>
+          <button type="submit" className={buttonClass("ghost", "w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700")}>
+            <LogOut className="h-4 w-4" />
+            Logout
+          </button>
+        </form>
       </div>
     </aside>
   );

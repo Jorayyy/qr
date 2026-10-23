@@ -201,12 +201,12 @@ export async function DashboardOverview() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[680px] text-left text-sm">
               <thead>
-                <tr className="border-b border-[var(--border)] text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
-                  <th className="px-5 py-2.5">Visitor</th>
-                  <th className="px-5 py-2.5">Destination</th>
-                  <th className="px-5 py-2.5">Purpose</th>
-                  <th className="px-5 py-2.5">Status</th>
-                  <th className="px-5 py-2.5">Registered</th>
+                <tr className="border-b border-[var(--border)] bg-slate-50/60 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+                  <th className="px-5 py-2.5 font-semibold">Visitor</th>
+                  <th className="px-5 py-2.5 font-semibold">Destination</th>
+                  <th className="px-5 py-2.5 font-semibold">Purpose</th>
+                  <th className="px-5 py-2.5 font-semibold">Status</th>
+                  <th className="px-5 py-2.5 font-semibold">Registered</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border)]">

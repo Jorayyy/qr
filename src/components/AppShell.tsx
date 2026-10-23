@@ -36,18 +36,28 @@ export function AppShell({ children, userName, userRole }: Props) {
   }, [open]);
 
   return (
-    <div className="flex h-[100dvh] flex-col overflow-hidden bg-[var(--background)] print:block print:h-auto print:overflow-visible lg:flex-row">
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-[var(--paper)] print:block print:h-auto print:overflow-visible lg:flex-row">
       {/* Phone/tablet header */}
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--border)] bg-white px-4 print:hidden lg:hidden">
+      <header className="flex h-14 shrink-0 items-center gap-3 bg-[var(--brand)] px-4 text-white print:hidden lg:hidden">
         <button
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Open navigation"
-          className="-ml-1 flex h-11 w-11 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100"
+          className="-ml-1 flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition hover:bg-white/10 hover:text-white"
         >
           <Menu className="h-5 w-5" />
         </button>
-        <span className="truncate text-sm font-bold tracking-tight">Visitor Management</span>
+        <img
+          src="/logo.png"
+          alt=""
+          className="h-8 w-8 shrink-0 rounded-md bg-white object-contain p-0.5"
+        />
+        <span className="truncate font-display text-sm font-bold tracking-tight">Visitor Management</span>
+        {userRole ? (
+          <span className="ml-auto rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em]">
+            {userRole}
+          </span>
+        ) : null}
       </header>
 
       {/* Desktop sidebar */}
@@ -83,7 +93,7 @@ export function AppShell({ children, userName, userRole }: Props) {
         </div>
       )}
 
-      <main className="min-w-0 flex-1 overflow-y-auto p-4 print:overflow-visible print:p-0 sm:p-6">{children}</main>
+      <main className="min-w-0 flex-1 overflow-y-auto p-4 print:overflow-visible print:p-0 sm:p-6 lg:p-8">{children}</main>
     </div>
   );
 }

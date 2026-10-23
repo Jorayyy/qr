@@ -5,7 +5,7 @@ import { recordAudit } from "@/lib/audit";
 import { can } from "@/lib/rbac";
 import { LIMITS, WINDOWS, rateLimit } from "@/lib/rate-limit";
 import { searchQuerySchema, uuidSchema } from "@/lib/validation";
-import { PageHeader, Button, Card, Badge, EmptyState, Input, Select } from "@/components/ui";
+import { PageHeader, Button, Card, Badge, EmptyState, Input, Select, Avatar } from "@/components/ui";
 import { Plus, Search } from "lucide-react";
 import { DeleteVisitorButton } from "./actions-client";
 
@@ -137,13 +137,13 @@ export default async function VisitorsPage({
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-left text-sm">
               <thead>
-                <tr className="border-b border-[var(--border)] text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
-                  <th className="px-5 py-3">Name</th>
-                  <th className="px-5 py-3">Email</th>
-                  <th className="px-5 py-3">Phone</th>
-                  <th className="px-5 py-3">Company</th>
-                  <th className="px-5 py-3">ID Type</th>
-                  <th className="px-5 py-3">Offices Visited</th>
+                <tr className="border-b border-[var(--border)] bg-slate-50/60 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+                  <th className="px-5 py-3 font-semibold">Name</th>
+                  <th className="px-5 py-3 font-semibold">Email</th>
+                  <th className="px-5 py-3 font-semibold">Phone</th>
+                  <th className="px-5 py-3 font-semibold">Company</th>
+                  <th className="px-5 py-3 font-semibold">ID Type</th>
+                  <th className="px-5 py-3 font-semibold">Offices Visited</th>
                   <th className="px-5 py-3 text-center">Total Visits</th>
                   <th className="px-5 py-3 text-right">Actions</th>
                 </tr>
@@ -155,7 +155,7 @@ export default async function VisitorsPage({
                     : v.visits;
                   const offices = [...new Set(v.visits.map((visit) => visit.department?.name).filter(Boolean))] as string[];
                   return (
-                    <tr key={v.id} className="hover:bg-slate-50">
+                    <tr key={v.id} className="transition-colors hover:bg-[var(--brand-soft)]/30">
                       <td className="px-5 py-3 font-medium">
                         {v.firstName} {v.lastName}
                       </td>
